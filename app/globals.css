@@ -1,0 +1,362 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-black text-zinc-100;
+  overflow-x: hidden;
+}
+
+body.theme-day {
+  background: #f5f7fb;
+  color: #111827;
+}
+
+body.theme-night {
+  background: #000000;
+  color: #f4f4f5;
+}
+
+@keyframes blobMotion {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(18px, -14px, 0) scale(1.08);
+  }
+}
+
+@keyframes softFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes navOpacityPulse {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.98;
+  }
+}
+
+@keyframes noteDrift {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateY(-16px) translateX(6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.78;
+  }
+}
+
+@keyframes noteDriftLiquid {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.94;
+  }
+  50% {
+    transform: translateY(-16px) translateX(6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.94;
+  }
+}
+
+.container {
+  @apply mx-auto max-w-6xl px-4;
+}
+
+.card {
+  @apply rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 shadow-xl shadow-black/30 backdrop-blur transition-all duration-300 hover:border-brand-500/60 hover:shadow-2xl hover:shadow-black/40;
+  background-image: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(24, 24, 27, 0.7));
+}
+
+.logo-badge {
+  @apply flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 font-bold text-white;
+}
+
+.hero-blob {
+  animation: blobMotion 9s ease-in-out infinite;
+}
+
+.hero-blob-delay {
+  animation-delay: 1.5s;
+}
+
+.soft-float {
+  animation: softFloat 5s ease-in-out infinite;
+}
+
+.global-background {
+  @apply fixed inset-0 z-0 overflow-hidden bg-black;
+}
+
+.global-blob {
+  @apply absolute rounded-full blur-3xl;
+  animation: blobMotion 14s ease-in-out infinite;
+}
+
+.global-blob-red {
+  width: 32rem;
+  height: 32rem;
+  left: -8rem;
+  top: -6rem;
+  background: rgba(220, 38, 38, 0.4);
+}
+
+.global-blob-white {
+  width: 28rem;
+  height: 28rem;
+  right: 8%;
+  top: 12%;
+  background: rgba(255, 255, 255, 0.12);
+  animation-delay: 1.8s;
+}
+
+.global-blob-black {
+  width: 34rem;
+  height: 34rem;
+  left: 30%;
+  bottom: -10rem;
+  background: rgba(8, 8, 8, 0.96);
+  animation-delay: 0.8s;
+}
+
+.global-blob-red-secondary {
+  width: 30rem;
+  height: 30rem;
+  right: -6rem;
+  bottom: -8rem;
+  background: rgba(185, 28, 28, 0.38);
+  animation-delay: 2.3s;
+}
+
+.global-blob-dark-secondary {
+  width: 26rem;
+  height: 26rem;
+  left: 12%;
+  top: 38%;
+  background: rgba(10, 10, 10, 0.94);
+  animation-delay: 1.1s;
+}
+
+.liquid-glass-nav {
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(10px) saturate(130%);
+  animation: navOpacityPulse 6s ease-in-out infinite;
+}
+
+.music-note {
+  position: absolute;
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.45),
+    0 0 18px rgba(220, 38, 38, 0.42),
+    0 2px 10px rgba(0, 0, 0, 0.55);
+  animation: noteDrift 5.5s ease-in-out infinite;
+}
+
+body.theme-day .global-background {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+body.theme-day .global-blob-white {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+body.theme-day .global-blob-red {
+  background: rgba(220, 38, 38, 0.18);
+}
+
+body.theme-day .global-blob-black {
+  background: rgba(148, 163, 184, 0.22);
+}
+
+body.theme-day .card {
+  border-color: rgba(203, 213, 225, 0.9);
+  background: rgba(255, 255, 255, 0.8);
+  background-image: none;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-day .card:hover {
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+}
+
+body.theme-day .liquid-glass-nav {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(203, 213, 225, 0.9);
+}
+
+body.theme-day .music-note {
+  color: #0f172a;
+  font-weight: 700;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.65),
+    0 0 16px rgba(220, 38, 38, 0.38),
+    0 1px 3px rgba(255, 255, 255, 0.9);
+}
+
+body.theme-day .text-zinc-100,
+body.theme-day .text-zinc-200,
+body.theme-day .text-zinc-300 {
+  color: #1f2937 !important;
+}
+
+body.theme-day .hero-card {
+  border-color: rgba(148, 163, 184, 0.65);
+}
+
+.hero-apple {
+  border-width: 1.5px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+body.theme-day .hero-image {
+  opacity: 0.45;
+}
+
+body.theme-day .hero-overlay {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.2), rgba(255, 255, 255, 0.45));
+}
+
+body.theme-day .hero-info-box {
+  border-color: rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.hero-info-box {
+  transition: border-color 250ms ease, box-shadow 250ms ease, background-color 250ms ease;
+}
+
+.hero-info-box:hover {
+  border-color: rgba(220, 38, 38, 0.45);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+}
+
+body.theme-day .hero-info-box:hover {
+  border-color: rgba(220, 38, 38, 0.45);
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.14);
+}
+
+body.theme-day .hero-info-title {
+  color: #111827;
+}
+
+body.theme-day .hero-info-title span {
+  color: #111827 !important;
+}
+
+body.theme-night .hero-info-box {
+  background: rgba(9, 9, 11, 0.52);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+body.theme-day .login-form {
+  border-color: rgba(148, 163, 184, 0.65);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+}
+
+body.theme-day .login-input {
+  border-color: rgba(148, 163, 184, 0.7);
+  background: #ffffff;
+  color: #0f172a;
+}
+
+body.theme-day .login-input::placeholder {
+  color: #64748b;
+}
+
+body.theme-day .login-primary-btn {
+  box-shadow: 0 10px 20px rgba(220, 38, 38, 0.22);
+}
+
+body.theme-day .login-secondary-btn {
+  border-color: rgba(148, 163, 184, 0.7);
+  background: rgba(241, 245, 249, 0.85);
+  color: #1e293b;
+}
+
+body.theme-day .login-secondary-btn:hover {
+  background: rgba(226, 232, 240, 0.95);
+}
+
+.login-tempo-logo {
+  filter: none;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+body.theme-day .login-tempo-logo {
+  filter: grayscale(1) brightness(2.35) contrast(1.1);
+  mix-blend-mode: screen;
+  opacity: 0.98;
+}
+
+/* /liquid: notalar arka planda kalır; hafif saydam sahne ile görünür olurlar */
+body.theme-night:has([data-liquid-page]) .music-notes-layer,
+body.theme-day:has([data-liquid-page]) .music-notes-layer {
+  z-index: 3;
+  opacity: 1;
+}
+
+body.theme-night:has([data-liquid-page]) .music-note {
+  animation-name: noteDriftLiquid;
+  color: #ffffff;
+  opacity: 1;
+  font-weight: 800;
+  -webkit-text-stroke: 0.55px rgba(0, 0, 0, 0.55);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.85),
+    0 0 10px rgba(255, 255, 255, 0.55),
+    0 0 22px rgba(255, 255, 255, 0.35),
+    0 0 36px rgba(220, 38, 38, 0.85),
+    0 0 72px rgba(220, 38, 38, 0.5),
+    0 4px 18px rgba(0, 0, 0, 0.75);
+  filter: contrast(1.22) brightness(1.12) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.65));
+}
+
+body.theme-day:has([data-liquid-page]) .music-note {
+  animation-name: noteDriftLiquid;
+  color: #020617;
+  opacity: 1;
+  font-weight: 800;
+  -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.55);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.95),
+    0 0 12px rgba(255, 255, 255, 0.75),
+    0 0 22px rgba(255, 255, 255, 0.5),
+    0 0 32px rgba(220, 38, 38, 0.58);
+  filter: contrast(1.15) drop-shadow(0 3px 5px rgba(15, 23, 42, 0.35));
+}
+
+body.theme-night:has([data-liquid-page]) .site-shell,
+body.theme-day:has([data-liquid-page]) .site-shell {
+  z-index: 25;
+  isolation: isolate;
+}
+

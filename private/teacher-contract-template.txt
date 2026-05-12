@@ -1,0 +1,32 @@
+Aşağıda isim (unvan) ve adresleri yazılı bulunan işveren ile işçi arasında, tamamen kendi istek ve serbest iradeleri ile ve belirtilen şartlarla "İŞ SÖZLEŞMESİ" yapılmıştır. Taraflar bundan sonra "işveren" ve "işçi" olarak anılacaktır.
+
+1. Taraflar
+
+İŞVERENİN
+Adı Soyadı (unvanı)                 : BURCU AYDOĞDU (ÖYKÜ MÜZİK LİMİTED ŞİRKETİ)
+Adresi                                  : Kardelen Mahallesi 2091. Sokak Aşağı Emek Sitesi 4/3
+SGK Numarası                         : -
+Vergi Dairesi                        : 6610963783
+Telefon/Faks No                     : 0540 940 87 87
+
+
+İŞÇİNİN
+Adı Soyadı                          : {adSoyad}
+T.C. Numarası                       : {tcKimlikNo}
+Baba Adı                            : {babaAdi}
+Doğum Yeri ve yazılı                : {dogumYeri} {dogumTarihi}
+İkamet Adresi                       : -
+Telefon/Faks No                     : {Telefon}
+
+
+2. İŞÇİNİN ÇALIŞMA YERİ             : İşverenin Öykü Müzik Limited Şirketi sınırları içindeki değişik iş yerlerinde veya vekilinin göstereceği yerler.
+
+3. YAPILACAK İŞ                     : {branslar}
+
+4. SÖZLEŞMENİN SÜRESİ               : Bu iş sözleşmesi, {sözlesmeTarihi} tarihinde başlamış olup, belirsiz sürelidir.
+
+5. İŞE BAŞLAMA TARİHİ               : {baslamaTarihi}
+
+6. DENEME SÜRESİ                    : Deneme süresi iki aydır. Taraflar, bu süre içerisinde iş sözleşmesini ihbarsız ve tazminatsız feshedebilirler.
+
+7. ÇALIŞMA SÜRELERİ                 : Haftalık çalışma süresi en fazla 45 saattir. Bu süre, haftanın çalışılan günlerine eşit şekilde bölünerek uygulanır.

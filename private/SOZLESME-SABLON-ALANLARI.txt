@@ -1,0 +1,27 @@
+İş sözleşmesi şablonu: UTF-8 metin dosyası (.txt), varsayılan yol private/teacher-contract-template.txt
+Özel dosya: .env içinde TEACHER_CONTRACT_TEMPLATE_PATH=private/sizin-metin.txt (yalnızca göreli yol).
+
+İndirme biçimleri (admin panelinden veya API):
+- Word (.docx): .../api/admin/teachers/<id>/contract veya ...?format=docx
+- PDF: ...?format=pdf
+
+Metin içinde yer tutucular düz yazılır; Word’ün XML’inde parça parça bölünmesi sorunu olmaz.
+
+Biçim — Word (.docx) orijinal düzeni yakalamak için:
+- `teacher-contract-template.txt` içinde gördüğünüz **her satır** Word’de **ayrı paragraf** olur (birleştirme/yaslama yok).
+- **Boş satır** = Word’de boş satır (Enter ile bıraktığınız dikey boşluk korunur).
+- Satır içindeki **boşluklar ve Tab** korunur; sekme aralığı `.env` ile ayarlanabilir (`TEACHER_CONTRACT_DOCX_TAB_STOP_CM`, varsayılan ~1,27 cm).
+- Varsayılan çıktı: **Times New Roman 12 pt**, kenar ~**2,5 cm**. Orijinal Word ile aynı olsun diye `.env` içinde örneğin: `TEACHER_CONTRACT_DOCX_FONT`, `TEACHER_CONTRACT_DOCX_FONT_SIZE_PT`, `TEACHER_CONTRACT_DOCX_MARGINS_CM` — ayrıntı .env.example dosyasında; sunucuyu yeniden başlatın.
+- PDF aynı satırları korur ama **Roboto** kullandığı için Word ile hizalar birebir olmaz; matbaa düzeni için .docx kullanın.
+
+İngilizce anahtarlar:
+{teacherName} {phone} {tcKimlikNo} {fatherName} {address}
+{birthDate} {birthPlace} {employmentStartDate} {insuranceStartDate}
+{instrumentsText} {generatedDate}
+
+Türkçe takma adlar (aynı veri):
+{adSoyad} {cepTelefonu} {babaAdi} {adres}
+{dogumTarihi} {dogumYeri} {iseBaslamaTarihi} {sigortaBaslangicTarihi}
+{branslar} {belgeTarihi}
+
+Not: PDF ve Word çıktıları sunucuda üretilir; Word ile şablon hazırlamanız gerekmez. Bağımlılıklar: `npm install` (docx, pdfmake).

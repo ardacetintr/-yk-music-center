@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// SQLite: enum yerine metin alanları (yerelde PostgreSQL/Docker gerekmez).
+
+datasource db {
+  provider = "sqlite"
+
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+
+  email String @unique
+
+  name String
+
+  passwordHash String
+
+  role String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  student Student?
+
+  teacher Teacher?
+
+  attendance AttendanceLog[]
+
+  passwordResetCodes PasswordResetCode[]
+}
+
+model PasswordResetCode {
+  id        String   @id @default(cuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Student {
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  /// Öğrenci cep telefonu kullanılmıyor; boş bırakılır. Giriş veli telefonu ile yapılır.
+  phone String @default("")
+
+  instrument String
+
+  parentName String?
+
+  parentPhone String?
+
+  primaryTeacherId String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  primaryTeacher Teacher? @relation("StudentPrimaryTeacher", fields: [primaryTeacherId], references: [id], onDelete: SetNull)
+
+  enrollments Enrollment[]
+
+  lessonSlots StudentLessonSlot[]
+
+  absences StudentAbsence[]
+
+  @@index([primaryTeacherId])
+}
+
+model Teacher {
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  phone String
+
+  /// JSON dizi: ["Piyano","Keman"] - öğrenci kurs listesiyle aynı etiketler
+  instruments String
+
+  tcKimlikNo String?
+
+  fatherName String?
+
+  address String?
+
+  birthDate String?
+
+  birthPlace String?
+
+  employmentStartDate String?
+
+  insuranceStartDate String?
+
+  approved Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  courses Course[]
+
+  lessonSlots StudentLessonSlot[]
+
+  primaryStudents Student[] @relation("StudentPrimaryTeacher")
+}
+
+/// Haftalık tekrarlayan ders şablonu (gün + saat).
+model StudentLessonSlot {
+  id String @id @default(cuid())
+
+  studentId String
+
+  /// Geçmiş uyumluluk; yeni kayıtlar INDIVIDUAL olarak saklanır.
+  scopeType String
+
+  /// 1 = Pazartesi … 7 = Pazar
+  dayOfWeek Int
+
+  /// HH:mm
+  startTime String
+
+  /// HH:mm
+  endTime String?
+
+  teacherId String?
+
+  label String?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  teacher Teacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+
+  @@index([studentId])
+
+  @@index([scopeType])
+}
+
+/// Öğrenci devamsızlık kaydı (tarih + isteğe bağlı not).
+model StudentAbsence {
+  id String @id @default(cuid())
+
+  studentId String
+
+  /// YYYY-AA-GG (yerel gün, metin)
+  absenceDate String
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+
+  @@index([absenceDate])
+}
+
+model TeacherApplication {
+  id String @id @default(cuid())
+
+  name String
+
+  email String
+
+  phone String
+
+  instrument String
+
+  experience Int
+
+  bio String?
+
+  status String @default("PENDING")
+
+  createdAt DateTime @default(now())
+}
+
+model Course {
+  id String @id @default(cuid())
+
+  name String
+
+  instrument String
+
+  teacherId String
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id String @id @default(cuid())
+
+  studentId String
+
+  courseId String
+
+  createdAt DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}
+
+model AttendanceLog {
+  id String @id @default(cuid())
+
+  userId String
+
+  date DateTime @default(now())
+
+  checkIn DateTime?
+
+  checkOut DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
