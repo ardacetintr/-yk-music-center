@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 
 const MESSAGES: Record<string, string> = {
@@ -28,7 +29,7 @@ export default function LessonScheduleFlashToast({ toastKey }: Props) {
   useEffect(() => {
     if (!key) return;
     setMsg(MESSAGES[key]);
-    router.replace(pathname, { scroll: false });
+    router.replace(pathname as Route, { scroll: false });
   }, [key, pathname, router]);
 
   useEffect(() => {

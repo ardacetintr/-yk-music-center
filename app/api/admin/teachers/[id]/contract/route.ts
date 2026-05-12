@@ -113,7 +113,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
   const safeFile = `is-sozlesmesi-${teacherId.slice(-12)}.${filenameSuffix}`;
 
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(buffer), {
     status: 200,
     headers: {
       "Content-Type": contentType,
