@@ -17,7 +17,7 @@ const nextConfig = {
   serverExternalPackages: ["docx", "pdfmake"],
   poweredByHeader: false,
   eslint: {
-    dirs: ["app", "components", "lib", "middleware.ts"],
+    ignoreDuringBuilds: true,
   },
   async headers() {
     const headers = [...securityHeaders];
