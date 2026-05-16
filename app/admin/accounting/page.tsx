@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import AccountingDueTodayPanel from "@/components/admin/AccountingDueTodayPanel";
-import AccountingStudentTable, {
-  type AccountingStudentRow
-} from "@/components/admin/AccountingStudentTable";
+import AccountingStudentsSection from "@/components/admin/AccountingStudentsSection";
+import type { AccountingStudentRow } from "@/components/admin/AccountingStudentTable";
 import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 import { bootstrapProductionDatabaseIfNeeded } from "@/lib/bootstrap-production-db";
 import {
@@ -10,9 +9,11 @@ import {
   isPaidForCurrentMonth,
   isPaymentDueReached
 } from "@/lib/payment-month";
-import { normalizePhone } from "@/lib/phone";
 import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
-import { resolvePaymentRecipientPhone } from "@/lib/payment-whatsapp";
+import {
+  buildPaymentReminderWhatsAppPayload,
+  resolvePaymentRecipientPhone
+} from "@/lib/payment-whatsapp";
 
 function formatMonthLabel(yyyyMm: string): string {
   const [y, m] = yyyyMm.split("-").map(Number);
@@ -40,20 +41,28 @@ export default async function AdminAccountingPage() {
     });
 
     rows = students.map((s) => {
-      const parentPhoneNorm = s.parentPhone ? normalizePhone(s.parentPhone) : "";
-      const hasParentPhone = Boolean(resolvePaymentRecipientPhone(s.parentPhone));
+      const recipientPhone = resolvePaymentRecipientPhone(s.parentPhone);
+      const parentPhoneNorm = recipientPhone ?? "";
+      const hasParentPhone = Boolean(recipientPhone);
       const isPaid = isPaidForCurrentMonth(s.paymentPaidMonth);
       const dueDay = s.paymentDueDay ?? 1;
+      const studentName = s.user.name;
 
       return {
         id: s.id,
-        name: s.user.name,
+        name: studentName,
         instrument: s.instrument,
         parentName: s.parentName,
         parentPhoneDisplay: parentPhoneNorm
           ? formatTurkeyMobileDisplay(parentPhoneNorm)
           : "",
         hasParentPhone,
+        waReminder: recipientPhone
+          ? buildPaymentReminderWhatsAppPayload({
+              normalizedRecipientPhone: recipientPhone,
+              studentName
+            })
+          : null,
         paymentDueDay: dueDay,
         isPaid,
         isDueReached: isPaymentDueReached(dueDay)
@@ -92,8 +101,6 @@ export default async function AdminAccountingPage() {
         </div>
       </section>
 
-      <AccountingDueTodayPanel dueRows={dueTodayRows} currentMonthLabel={currentMonthLabel} />
-
       <section className="card space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold">Öğrenci ödemeleri — {currentMonthLabel}</h2>
@@ -102,8 +109,14 @@ export default async function AdminAccountingPage() {
             <span className="text-red-400">Ödenmedi</span> — duruma tıklayarak değiştirin
           </p>
         </div>
-        <AccountingStudentTable rows={rows} currentMonthLabel={currentMonthLabel} />
+        <AccountingStudentsSection
+          rows={rows}
+          currentMonthLabel={currentMonthLabel}
+          title="Tüm öğrenciler"
+        />
       </section>
+
+      <AccountingDueTodayPanel dueRows={dueTodayRows} currentMonthLabel={currentMonthLabel} />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { getPublicAppOrigin } from "@/lib/public-app-url";
 import { normalizePhone } from "@/lib/phone";
+import { buildWhatsAppSendUrl, toWhatsAppInternationalPhone } from "@/lib/whatsapp-url";
 
 /** normalizePhone çıktısı (10 hane, 5 ile başlar) → 0XXX XXX XX XX */
 export function formatTurkeyMobileDisplay(normalized10: string): string {
@@ -76,7 +77,8 @@ export function buildStudentLoginWhatsAppUrl(params: {
     plainPassword: params.plainPassword,
     audience
   });
-  const digits = params.normalizedRecipientPhone.replace(/\D/g, "");
-  const waRecipient = digits.length === 10 ? `90${digits}` : digits.startsWith("90") ? digits : `90${digits}`;
-  return `https://wa.me/${waRecipient.replace(/^\+/, "")}?text=${encodeURIComponent(body)}`;
+  return buildWhatsAppSendUrl({
+    phone: toWhatsAppInternationalPhone(params.normalizedRecipientPhone),
+    text: body
+  });
 }

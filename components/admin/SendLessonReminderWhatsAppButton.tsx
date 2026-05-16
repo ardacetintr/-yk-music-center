@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { prepareLessonReminderWhatsApp } from "@/app/admin/lesson-schedules/actions";
+import { openWhatsAppTab } from "@/lib/whatsapp-queue";
 
 type Props = {
   slotId: string;
@@ -30,7 +31,7 @@ export default function SendLessonReminderWhatsAppButton({
         setError(res.message);
         return;
       }
-      window.open(res.waUrl, "_blank", "noopener,noreferrer");
+      openWhatsAppTab(res.send, `${slotId}_${recipient}`);
     } catch {
       setError("Mesaj hazırlanırken bir hata oluştu.");
     } finally {

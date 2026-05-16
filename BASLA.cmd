@@ -24,11 +24,17 @@ if errorlevel 1 (
   exit /b 1
 )
 
+call scripts\free-port-3000.cmd
+
 echo.
+echo  Site:             http://localhost:3000
 echo  Admin giris:      http://localhost:3000/admin/login
 echo  Durdurmak icin:   Ctrl+C
 echo.
+echo  NOT: Terminalde baska port yazarsa (3001, 3003...) yukaridaki
+echo       adres yerine terminaldeki Local: satirini kullanin.
+echo.
 echo  (Internetten giris icin CANLI-SITE.cmd - istege bagli)
 echo.
-node node_modules\next\dist\bin\next dev
+node node_modules\next\dist\bin\next dev -p 3000
 pause

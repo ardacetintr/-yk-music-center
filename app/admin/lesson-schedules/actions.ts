@@ -6,6 +6,7 @@ import { getServerSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/phone";
 import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
+import { toWhatsAppInternationalPhone, type WhatsAppSendPayload } from "@/lib/whatsapp-url";
 import { weekdayLabelTr } from "@/lib/weekdays-tr";
 import { LESSON_SCOPE_INDIVIDUAL } from "@/lib/lesson-schedule-scope";
 import { normalizeTimeHHmm } from "@/lib/time-hhmm";
@@ -146,13 +147,8 @@ export async function deleteLessonSlotInline(formData: FormData) {
 }
 
 export type PrepareLessonReminderWhatsAppResult =
-  | { ok: true; waUrl: string }
+  | { ok: true; send: WhatsAppSendPayload }
   | { ok: false; message: string };
-
-function toWaRecipient(normalizedPhone: string): string {
-  const digits = normalizedPhone.replace(/\D/g, "");
-  return digits.length === 10 ? `90${digits}` : digits.startsWith("90") ? digits : `90${digits}`;
-}
 
 function timeRange(startTime: string, endTime: string | null): string {
   return endTime ? `${startTime} - ${endTime}` : startTime;
@@ -232,6 +228,11 @@ export async function prepareLessonReminderWhatsApp(
           ...(slot.notes ? [`• Not: ${slot.notes}`] : [])
         ].join("\n");
 
-  const waUrl = `https://wa.me/${toWaRecipient(targetPhone)}?text=${encodeURIComponent(body)}`;
-  return { ok: true, waUrl };
+  return {
+    ok: true,
+    send: {
+      phone: toWhatsAppInternationalPhone(targetPhone),
+      text: body
+    }
+  };
 }

@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { applyResolvedDatabaseUrl, isPostgresDatabaseUrl } from "./database-url";
@@ -11,7 +10,10 @@ export function hasLocalSqliteExport(): boolean {
   return existsSync(LOCAL_SQLITE);
 }
 
-/** Yerel: Postgres URL varsa tablo + seed; yoksa sadece uyar. */
+/**
+ * Yerel geliştirmede prisma import sırasında db push/seed ÇALIŞTIRMAZ
+ * (sayfa açılışını dakikalarca kilitleyebilir). Kurulum: BASLA.cmd / setup-local.cmd.
+ */
 export function bootstrapLocalDatabaseIfNeeded(): void {
   if (process.env.VERCEL === "1" || process.env.VERCEL === "true") return;
   if (process.env.NEXT_PHASE) return;
@@ -22,17 +24,8 @@ export function bootstrapLocalDatabaseIfNeeded(): void {
   const url = applyResolvedDatabaseUrl();
   if (!url || !isPostgresDatabaseUrl(url)) {
     console.warn(
-      "[yk-music-center] Canli site ile ayni veri icin .env dosyasina Vercel Postgres URL ekleyin. " +
-        "VERITABANI-AKTAR.cmd dosyasina bakin."
+      "[yk-music-center] Canli site ile ayni veri icin .env dosyasina Postgres URL ekleyin. " +
+        "VERITABANI-AKTAR.cmd veya BASLA.cmd"
     );
-    return;
-  }
-
-  try {
-    const env = { ...process.env, DATABASE_URL: url };
-    execSync("npx prisma db push --skip-generate", { cwd: process.cwd(), env, stdio: "pipe" });
-    execSync("npm run prisma:seed", { cwd: process.cwd(), env, stdio: "pipe" });
-  } catch (err) {
-    console.error("[yk-music-center] Veritabani:", err);
   }
 }

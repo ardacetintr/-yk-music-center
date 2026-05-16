@@ -5,9 +5,10 @@ import { getServerSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
 import {
-  buildPaymentReminderWhatsAppUrl,
+  buildPaymentReminderWhatsAppPayload,
   resolvePaymentRecipientPhone
 } from "@/lib/payment-whatsapp";
+import type { WhatsAppSendPayload } from "@/lib/whatsapp-url";
 import {
   clampPaymentDueDay,
   getCurrentPaymentMonth,
@@ -55,7 +56,7 @@ export async function setStudentPaymentPaid(formData: FormData) {
 }
 
 export type PreparePaymentReminderWhatsAppResult =
-  | { ok: true; waUrl: string }
+  | { ok: true; send: WhatsAppSendPayload }
   | { ok: false; message: string };
 
 export async function preparePaymentReminderWhatsApp(
@@ -79,12 +80,12 @@ export async function preparePaymentReminderWhatsApp(
     };
   }
 
-  const waUrl = buildPaymentReminderWhatsAppUrl({
+  const send = buildPaymentReminderWhatsAppPayload({
     normalizedRecipientPhone: phone,
     studentName: student.user.name
   });
 
-  return { ok: true, waUrl };
+  return { ok: true, send };
 }
 
 export type PaymentReminderTarget = {
@@ -92,7 +93,7 @@ export type PaymentReminderTarget = {
   studentName: string;
   parentName: string | null;
   parentPhoneDisplay: string;
-  waUrl: string;
+  send: WhatsAppSendPayload;
 };
 
 export type PrepareDueTodayBulkResult =
@@ -133,7 +134,7 @@ export async function prepareDueTodayBulkPaymentReminders(): Promise<PrepareDueT
       studentName: name,
       parentName: s.parentName,
       parentPhoneDisplay: formatTurkeyMobileDisplay(phone),
-      waUrl: buildPaymentReminderWhatsAppUrl({
+      send: buildPaymentReminderWhatsAppPayload({
         normalizedRecipientPhone: phone,
         studentName: name
       })
@@ -173,7 +174,7 @@ export async function preparePaymentRemindersForStudentIds(
       studentName: name,
       parentName: s.parentName,
       parentPhoneDisplay: formatTurkeyMobileDisplay(phone),
-      waUrl: buildPaymentReminderWhatsAppUrl({
+      send: buildPaymentReminderWhatsAppPayload({
         normalizedRecipientPhone: phone,
         studentName: name
       })

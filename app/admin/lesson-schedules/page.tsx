@@ -14,6 +14,7 @@ import LessonSlotDersSelect from "@/components/forms/LessonSlotDersSelect";
 import LessonSlotEditForm from "@/components/forms/LessonSlotEditForm";
 import LessonScheduleFlashToast from "@/components/admin/LessonScheduleFlashToast";
 import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
+import { getTeacherScheduleColors } from "@/lib/teacher-schedule-colors";
 
 function toastFromSearchParams(searchParams?: Record<string, string | string[] | undefined>) {
   const raw = searchParams?.toast;
@@ -244,7 +245,13 @@ export default async function AdminLessonSchedulesPage({
                       <td className="py-2 pr-3 text-zinc-200">{slot.student.user.name}</td>
                       <td className="py-2 pr-3 text-zinc-300">{weekdayLabelTr(slot.dayOfWeek)}</td>
                       <td className="py-2 pr-3 font-mono text-xs text-zinc-300">{timeRange(slot)}</td>
-                      <td className="py-2 pr-3 text-zinc-400">{slot.teacher?.user.name ?? "—"}</td>
+                      <td
+                        className={`py-2 pr-3 font-medium ${
+                          getTeacherScheduleColors(slot.teacherId, slot.teacher?.user.name).teacherClass
+                        }`}
+                      >
+                        {slot.teacher?.user.name ?? "—"}
+                      </td>
                       <td className="max-w-[12rem] truncate py-2 pr-3 text-xs text-zinc-500">
                         {[slot.label, slot.notes].filter(Boolean).join(" · ") || "—"}
                       </td>

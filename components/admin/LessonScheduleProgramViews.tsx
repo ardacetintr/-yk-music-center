@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { getTeacherScheduleColors } from "@/lib/teacher-schedule-colors";
 import { WEEKDAYS_TR_MON_FIRST, weekdayLabelTr } from "@/lib/weekdays-tr";
 
 export type ScheduleSlotPayload = {
@@ -164,17 +165,37 @@ export default function LessonScheduleProgramViews({ slots }: Props) {
   const dowForDay = jsDateToSchemaDayOfWeek(dayAnchor);
   const daySlots = useMemo(() => slotsForDay(filteredSlots, dowForDay), [filteredSlots, dowForDay]);
 
-  const slotCard = (s: ScheduleSlotPayload) => (
+  const slotCard = (s: ScheduleSlotPayload) => {
+    const c = getTeacherScheduleColors(s.teacherId, s.teacherName);
+    return (
     <div
       key={s.id}
-      className="rounded-md border border-zinc-700/80 bg-black/40 px-2 py-1.5 text-[11px] leading-snug text-zinc-200"
+      className={`rounded-md border px-2 py-1.5 text-[11px] leading-snug ${c.cardClass}`}
     >
-      <div className="font-mono text-[10px] text-brand-200/90">{timeRange(s)}</div>
-      <div className="font-medium text-zinc-100">{s.studentName}</div>
-      {s.teacherName ? <div className="text-zinc-500">{s.teacherName}</div> : null}
-      {s.label ? <div className="text-zinc-600">{s.label}</div> : null}
-    </div>
-  );
+        <div className={`font-mono text-[10px] ${c.timeClass}`}>{timeRange(s)}</div>
+        <div className={`font-medium ${c.studentClass}`}>{s.studentName}</div>
+        {s.teacherName ? <div className={c.teacherClass}>{s.teacherName}</div> : null}
+        {s.label ? <div className={c.labelClass}>{s.label}</div> : null}
+      </div>
+    );
+  };
+
+  const slotCardCompact = (s: ScheduleSlotPayload, cellKey: string) => {
+    const c = getTeacherScheduleColors(s.teacherId, s.teacherName);
+    return (
+      <div
+        key={`${s.id}-${cellKey}`}
+        className={`rounded border px-1 py-0.5 leading-tight text-[10px] ${c.cardClass}`}
+      >
+        <span className={`font-mono ${c.timeClass}`}>{timeRange(s)}</span>
+        <span className={`mt-0.5 block font-medium ${c.studentClass}`}>{s.studentName}</span>
+        {s.teacherName ? (
+          <span className={`mt-0.5 block text-[9px] ${c.teacherClass}`}>{s.teacherName}</span>
+        ) : null}
+      </div>
+    );
+  };
+
 
   return (
     <div className="space-y-4">
@@ -253,6 +274,24 @@ export default function LessonScheduleProgramViews({ slots }: Props) {
           </div>
         ) : null}
       </div>
+
+      {hasSlots && teacherFilterOptions.length > 0 ? (
+        <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-800 bg-zinc-950/40 px-3 py-2">
+          <span className="w-full text-[11px] font-medium text-zinc-500">Öğretmen renkleri</span>
+          {teacherFilterOptions.map((o) => {
+            const c = getTeacherScheduleColors(o.id, o.name);
+            return (
+              <span
+                key={o.id}
+                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] ${c.cardClass}`}
+              >
+                <span className={`h-2 w-2 shrink-0 rounded-full ring-1 ${c.legendDotClass}`} />
+                <span className={c.teacherClass}>{o.name}</span>
+              </span>
+            );
+          })}
+        </div>
+      ) : null}
 
       {!hasSlots ? (
         <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-4 py-6 text-center text-sm text-zinc-500">
@@ -432,15 +471,7 @@ export default function LessonScheduleProgramViews({ slots }: Props) {
                             {cell.getDate()}
                           </div>
                           <div className="flex flex-col gap-1">
-                            {cellSlots.map((s) => (
-                              <div
-                                key={`${s.id}-${key}`}
-                                className="rounded border border-zinc-700/70 bg-black/50 px-1 py-0.5 leading-tight text-[10px] text-zinc-200"
-                              >
-                                <span className="font-mono text-brand-200/90">{timeRange(s)}</span>
-                                <span className="mt-0.5 block font-medium">{s.studentName}</span>
-                              </div>
-                            ))}
+                            {cellSlots.map((s) => slotCardCompact(s, key))}
                           </div>
                         </td>
                       );

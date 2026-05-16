@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import {
-  preparePaymentReminderWhatsApp,
   setStudentPaymentPaid,
   updateStudentPaymentDueDay
 } from "@/app/admin/accounting/actions";
+import { openWhatsAppTab } from "@/lib/whatsapp-queue";
+import type { WhatsAppSendPayload } from "@/lib/whatsapp-url";
 
 export type AccountingStudentRow = {
   id: string;
@@ -14,6 +15,8 @@ export type AccountingStudentRow = {
   parentName: string | null;
   parentPhoneDisplay: string;
   hasParentPhone: boolean;
+  /** Veliye ödeme hatırlatması (telefon + metin; URL tıklamada üretilir). */
+  waReminder: WhatsAppSendPayload | null;
   paymentDueDay: number;
   isPaid: boolean;
   isDueReached: boolean;
@@ -103,7 +106,6 @@ function AccountingRow({
   const [dueDay, setDueDay] = useState(String(row.paymentDueDay));
   const [savingDay, setSavingDay] = useState(false);
   const [togglingPaid, setTogglingPaid] = useState(false);
-  const [waPending, setWaPending] = useState(false);
   const [error, setError] = useState("");
 
   async function saveDueDay() {
@@ -138,21 +140,13 @@ function AccountingRow({
     }
   }
 
-  async function sendWhatsApp() {
-    setWaPending(true);
-    setError("");
-    try {
-      const res = await preparePaymentReminderWhatsApp(row.id);
-      if (!res.ok) {
-        setError(res.message);
-        return;
-      }
-      window.open(res.waUrl, "_blank", "noopener,noreferrer");
-    } catch {
-      setError("WhatsApp hazırlanamadı.");
-    } finally {
-      setWaPending(false);
+  function sendWhatsApp() {
+    if (!row.waReminder) {
+      setError("Veli telefonu eksik.");
+      return;
     }
+    setError("");
+    openWhatsAppTab(row.waReminder, row.id);
   }
 
   const rowHighlight = row.isDueReached && !row.isPaid ? "bg-amber-950/20" : "";
@@ -218,7 +212,7 @@ function AccountingRow({
         <button
           type="button"
           onClick={sendWhatsApp}
-          disabled={waPending || !row.hasParentPhone}
+          disabled={!row.hasParentPhone}
           title={
             row.hasParentPhone
               ? "Veliye ödeme hatırlatması (WhatsApp)"
@@ -226,7 +220,7 @@ function AccountingRow({
           }
           className="rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#20BD5A] disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {waPending ? "…" : "WhatsApp"}
+          WhatsApp
         </button>
         {error ? <p className="mt-1 text-[11px] text-red-400">{error}</p> : null}
       </td>

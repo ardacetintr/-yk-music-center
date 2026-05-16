@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cmd /c scripts\\dev.cmd",
     "build": "node scripts/vercel-build.mjs",
     "vercel-build": "node scripts/vercel-build.mjs",
     "build:next": "next build",
