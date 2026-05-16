@@ -23,6 +23,8 @@ function buildUrlFromPgEnv(): string | null {
 /** Neon özel önek kullanırsa (ör. NEON_DATABASE_URL) veya elle eklenen diğer anahtarlar */
 function findPostgresUrlInAllEnv(onVercel: boolean): string | null {
   const preferredKeyHints = [
+    "YK_DATABASE_URL",
+    "MUSIC_CENTER_DATABASE_URL",
     "POSTGRES_PRISMA_URL",
     "POSTGRES_URL",
     "DATABASE_URL_UNPOOLED",
@@ -61,9 +63,13 @@ function findPostgresUrlInAllEnv(onVercel: boolean): string | null {
 export function resolveDatabaseUrl(): string | null {
   const onVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
 
+  // Vercel'de DATABASE_URL kilitli/file iken elle eklenen yedek (Production'a yazilir)
   const candidates = [
+    process.env.YK_DATABASE_URL,
+    process.env.MUSIC_CENTER_DATABASE_URL,
     process.env.POSTGRES_PRISMA_URL,
     process.env.POSTGRES_URL,
+    process.env.POSTGRES_URL_NON_POOLING,
     process.env.DATABASE_URL_UNPOOLED,
     process.env.NEON_DATABASE_URL,
     process.env.DATABASE_URL

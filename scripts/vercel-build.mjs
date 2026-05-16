@@ -4,6 +4,8 @@ function pickPostgresUrl() {
   const skipFile = (u) =>
     u && !u.startsWith("file:") && !u.startsWith("sqlite:");
   const candidates = [
+    process.env.YK_DATABASE_URL,
+    process.env.MUSIC_CENTER_DATABASE_URL,
     process.env.POSTGRES_PRISMA_URL,
     process.env.POSTGRES_URL,
     process.env.DATABASE_URL_UNPOOLED,

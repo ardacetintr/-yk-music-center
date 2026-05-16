@@ -10,9 +10,16 @@ export function getAdminLoadErrorMessage(): string {
         "(Kilitli satırı elle silmeye gerek yok; Neon yeniden bağlanınca postgresql olur.)"
       );
     }
+    if (d.postgresKeys.length === 0) {
+      return (
+        "Canlı sitede hiç Postgres adresi yok (veri Neon'da duruyor, Vercel bağlanmıyor). " +
+        "Vercel → Settings → Environment Variables → Add → Name: YK_DATABASE_URL → " +
+        "Value: .env dosyanızdaki postgresql://... (green-star) → sadece Production → Save → Redeploy."
+      );
+    }
     return (
-      "Canlı sitede Postgres adresi okunamıyor. Neon projeye bağlı olsa bile Production ortamına " +
-      "işlendiğinden emin olun (Integrations → Neon → Projects). Redeploy sonrası /admin → Verileri yükle."
+      "Canlı sitede Postgres okunamıyor. Integrations → Neon → Projects → Production işaretli olsun " +
+      "veya YK_DATABASE_URL ekleyin (yukarıdaki gibi) → Redeploy."
     );
   }
   if (!resolveDatabaseUrl()) {

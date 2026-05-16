@@ -37,7 +37,7 @@ export async function GET() {
       hint = "Postgres anahtarları var ama çözülemedi. Redeploy deneyin.";
     } else {
       hint =
-        "Postgres adresi bulunamadı. Integrations → Neon → Projects → bu proje Production için bağlı mı kontrol edin.";
+        "Production'da postgres env yok. Vercel → Environment Variables → YK_DATABASE_URL = green-star postgresql adresi (Production) → Redeploy.";
     }
   } else if (studentCount === 0) {
     hint = "Bağlantı tamam; öğrenci yok. Admin panelinde «Verileri yükle» düğmesine basın.";
