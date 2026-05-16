@@ -126,8 +126,7 @@
     radial-gradient(ellipse 65% 50% at -15% 72%, rgba(39, 39, 42, 0.58), transparent 55%),
     radial-gradient(ellipse 50% 40% at 70% 88%, rgba(127, 29, 29, 0.2), transparent 50%),
     linear-gradient(175deg, rgba(0, 0, 0, 0.72) 0%, rgba(5, 5, 6, 0.76) 42%, rgba(8, 8, 9, 0.8) 100%);
-  background-size: 120% 120%, 120% 120%, 120% 120%, 100% 100%, 100% 100%;
-  animation: liquidBgDrift 28s ease-in-out infinite;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
 }
 
 .stage::before {
@@ -145,10 +144,10 @@
 .glowOrb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(80px);
+  filter: blur(40px);
   pointer-events: none;
   z-index: 0;
-  animation: liquidShimmer 16s ease-in-out infinite;
+  opacity: 0.85;
 }
 
 .glowOrbBrand {
@@ -204,12 +203,10 @@
 .waveShelfInner {
   position: absolute;
   inset: 0;
-  animation: liquidWaveVertical 9s ease-in-out infinite;
 }
 
 .waveShelfInnerSlow {
-  animation-duration: 14s;
-  animation-delay: -2s;
+  opacity: 0.92;
 }
 
 .waveTrack {
@@ -217,28 +214,49 @@
   left: 0;
   bottom: 0;
   display: flex;
-  width: 200%;
+  width: 100%;
   height: 100%;
-  will-change: transform;
   gap: 0;
 }
 
-.waveTrackForward {
-  animation: liquidWaveDrift 21s linear infinite;
-}
-
-.waveTrackReverse {
-  animation: liquidWaveDriftReverse 31s linear infinite;
-}
-
-.waveTrackMid {
-  animation: liquidWaveDrift 16s linear infinite;
-  opacity: 0.88;
-}
-
+.waveTrackForward,
+.waveTrackReverse,
+.waveTrackMid,
 .waveTrackFast {
-  animation: liquidWaveDrift 11s linear infinite;
-  opacity: 0.55;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .waveShelfInner {
+    animation: liquidWaveVertical 14s ease-in-out infinite;
+  }
+
+  .waveShelfInnerSlow {
+    animation-duration: 18s;
+    animation-delay: -2s;
+  }
+
+  .waveTrack {
+    width: 200%;
+  }
+
+  .waveTrackForward {
+    animation: liquidWaveDrift 28s linear infinite;
+  }
+
+  .waveTrackReverse {
+    animation: liquidWaveDriftReverse 36s linear infinite;
+  }
+
+  .waveTrackMid {
+    animation: liquidWaveDrift 22s linear infinite;
+    opacity: 0.88;
+  }
+
+  .waveTrackFast {
+    animation: liquidWaveDrift 18s linear infinite;
+    opacity: 0.55;
+  }
 }
 
 .waveSvg {
@@ -316,10 +334,8 @@
   width: 100%;
   border-radius: clamp(1.5rem, 4.5vw, 2.25rem);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.28) 100%),
-    rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(42px) saturate(200%);
-  -webkit-backdrop-filter: blur(42px) saturate(200%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.55) 100%),
+    rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow:
     0 0 0 0.5px rgba(0, 0, 0, 0.06),

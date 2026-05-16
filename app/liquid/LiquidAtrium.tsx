@@ -75,9 +75,6 @@ export default function LiquidAtrium() {
   return (
     <div className={`${styles.stage} min-h-0 flex-1`}>
       <div className={`${styles.glowOrb} ${styles.glowOrbBrand}`} aria-hidden />
-      <div className={`${styles.glowOrb} ${styles.glowOrbWhite}`} aria-hidden />
-      <div className={`${styles.glowOrb} ${styles.glowOrbZinc}`} aria-hidden />
-      <div className={`${styles.glowOrb} ${styles.glowOrbBrandDeep}`} aria-hidden />
 
       <div className={styles.content}>
         <div className={styles.blobCluster}>
@@ -108,24 +105,14 @@ export default function LiquidAtrium() {
       </div>
 
       <div className={styles.waveShelf} aria-hidden>
-        <div className={`${styles.waveShelfInner} ${styles.waveShelfInnerSlow}`}>
-          <div className="absolute inset-0 translate-y-4">
+        <div className={styles.waveShelfInner}>
+          <div className="absolute inset-0 translate-y-2">
             <WaveTrack motion="forward" fill="rgba(24,24,27,0.93)" path={WAVE_PATH_A} tall />
           </div>
         </div>
-        <div className={styles.waveShelfInner}>
-          <div className="absolute inset-0 translate-y-1">
-            <WaveTrack motion="mid" fill="rgba(220,38,38,0.36)" path={WAVE_PATH_B} />
-          </div>
-        </div>
-        <div className={styles.waveShelfInner}>
-          <div className="absolute inset-0 -translate-y-1">
-            <WaveTrack motion="reverse" fill="rgba(255,255,255,0.09)" path={WAVE_PATH_A} />
-          </div>
-        </div>
         <div className={`${styles.waveShelfInner} ${styles.waveShelfInnerSlow}`}>
-          <div className="absolute inset-0 -translate-y-3 opacity-80">
-            <WaveTrack motion="fast" fill="rgba(250,250,250,0.05)" path={WAVE_PATH_B} />
+          <div className="absolute inset-0 -translate-y-1">
+            <WaveTrack motion="mid" fill="rgba(220,38,38,0.32)" path={WAVE_PATH_B} />
           </div>
         </div>
       </div>

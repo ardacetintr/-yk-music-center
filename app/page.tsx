@@ -12,7 +12,9 @@ export default function HomePage() {
             src="/Gemini_Generated_Image_616kg5616kg5616k.png"
             alt="Müzik sınıfı"
             fill
-            className="hero-image object-cover opacity-30 blur-[1px]"
+            sizes="(max-width: 768px) 100vw, 1152px"
+            quality={70}
+            className="hero-image object-cover opacity-30"
             priority
           />
           <div className="hero-overlay absolute inset-0 bg-black/30" />
@@ -23,7 +25,7 @@ export default function HomePage() {
             <h1 className="mx-auto mt-4 max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">
               Eğitimi Bir Adım İleri Taşıyoruz
             </h1>
-            <div className="hero-info-box mx-auto mt-8 max-w-4xl rounded-3xl border border-white/25 bg-black/45 p-7 text-left backdrop-blur">
+            <div className="hero-info-box mx-auto mt-8 max-w-4xl rounded-3xl border border-white/25 bg-black/55 p-7 text-left">
               <h2 className="hero-info-title text-center text-2xl font-semibold text-white">
                 Karşınızda <span className="text-brand-500">Tempo</span> Bilgi Sistemi!
               </h2>
