@@ -29,3 +29,4 @@ prisma/dev.db-wal
 prisma/dev.db-shm
 prisma/vercel-build.db
 prisma/vercel-build.db-journal
+prisma/.db-setup-done

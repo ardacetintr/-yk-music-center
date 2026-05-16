@@ -54,20 +54,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <article className="card">
-            <h2 className="mb-3 text-2xl font-semibold">Duyurular</h2>
-            <p className="text-zinc-300">
-              Yeni dönem kayıtları, etkinlik tarihleri ve kurum içi bilgilendirmeler bu alanda paylaşılacak.
-            </p>
-          </article>
-          <article className="card">
-            <h2 className="mb-3 text-2xl font-semibold">Blog</h2>
-            <p className="text-zinc-300">
-              Müzik eğitimi, pratik önerileri, enstrüman bakımı ve başarı hikayeleri için blog içerikleri burada olacak.
-            </p>
-          </article>
-        </div>
         <div className="card">
           <h2 className="mb-2 text-2xl font-semibold">Öykü Music Center Ankara</h2>
           <p className="mb-4 text-zinc-300">

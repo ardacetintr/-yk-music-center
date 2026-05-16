@@ -9,7 +9,7 @@ if not exist ".env" (
     exit /b 1
   )
   copy /Y ".env.example" ".env" >nul
-  echo  .env dosyasi olusturuldu (.env.example kopyalandi).
+  echo  .env dosyasi olusturuldu.
 )
 
 if not exist "node_modules\prisma" (

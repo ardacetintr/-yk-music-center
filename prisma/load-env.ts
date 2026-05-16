@@ -31,13 +31,31 @@ function loadEnvFile(filename: string) {
   }
 }
 
+/** Vercel entegrasyonlarının verdiği isimleri tek forma toplar. */
+function normalizeDatabaseEnv(): void {
+  if (!process.env.DATABASE_URL?.trim()) {
+    const url =
+      process.env.TURSO_DATABASE_URL ??
+      process.env.TURSO_LIBSQL_URL ??
+      process.env.POSTGRES_PRISMA_URL ??
+      process.env.POSTGRES_URL;
+    if (url?.trim()) process.env.DATABASE_URL = url.trim();
+  }
+
+  if (!process.env.DATABASE_AUTH_TOKEN?.trim()) {
+    const token = process.env.TURSO_AUTH_TOKEN;
+    if (token?.trim()) process.env.DATABASE_AUTH_TOKEN = token.trim();
+  }
+}
+
 export function ensureAppEnv(): void {
   loadRootEnv();
+  normalizeDatabaseEnv();
 
   const strictProd =
     process.env.VERCEL_ENV === "production" || process.env.ENFORCE_STRONG_JWT_SECRET === "1";
 
-  if (!process.env.DATABASE_URL?.trim() && !strictProd) {
+  if (!process.env.DATABASE_URL?.trim() && !strictProd && !process.env.VERCEL) {
     process.env.DATABASE_URL = DEV_DATABASE_URL;
   }
 

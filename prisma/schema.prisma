@@ -2,7 +2,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// SQLite: enum yerine metin alanları (yerelde PostgreSQL/Docker gerekmez).
+// SQLite: yerelde prisma/dev.db; Vercel'de Turso (libsql:// + DATABASE_AUTH_TOKEN).
 
 datasource db {
   provider = "sqlite"

@@ -10,12 +10,18 @@ import { normalizePhone } from "@/lib/phone";
 import { findUserByLoginPhone } from "@/lib/auth-lookup";
 import { foldTurkishCharsForPassword } from "@/lib/password-login-normalize";
 import { readJsonBody, routeErrorResponse } from "@/lib/route-errors";
+import { getDatabaseEnvProblem } from "@/lib/database-env";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/lib/roles";
 import { allowRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    const dbProblem = getDatabaseEnvProblem();
+    if (dbProblem) {
+      return NextResponse.json({ message: dbProblem }, { status: 503 });
+    }
+
     const ip = getClientIp(request);
     if (!allowRateLimit(`login:${ip}`, 40, 15 * 60 * 1000)) {
       return NextResponse.json(

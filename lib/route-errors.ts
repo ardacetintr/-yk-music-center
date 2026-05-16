@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
+import { getDatabaseEnvProblem } from "@/lib/database-env";
 
 function zodUserMessage(err: ZodError): string {
   const flat = err.flatten().fieldErrors;
@@ -18,6 +19,11 @@ function zodUserMessage(err: ZodError): string {
 }
 
 export function routeErrorResponse(error: unknown): NextResponse {
+  const dbEnvProblem = getDatabaseEnvProblem();
+  if (dbEnvProblem) {
+    return NextResponse.json({ message: dbEnvProblem }, { status: 503 });
+  }
+
   if (error instanceof ZodError) {
     return NextResponse.json({ message: zodUserMessage(error) }, { status: 422 });
   }
@@ -72,18 +78,16 @@ export function routeErrorResponse(error: unknown): NextResponse {
       );
     }
     if (raw.includes("DATABASE_URL") || raw.includes("Environment variable not found")) {
+      const msg = getDatabaseEnvProblem();
       return NextResponse.json(
-        {
-          message:
-            "DATABASE_URL ayarı bulunamadı. Proje kökünde .env dosyası oluşturun (.env.example içeriğini kopyalayabilirsiniz), ardından geliştirme sunucusunu yeniden başlatın."
-        },
+        { message: msg ?? "Veritabanı bağlantı ayarı eksik veya hatalı." },
         { status: 503 }
       );
     }
     return NextResponse.json(
       {
         message:
-          "Veritabanı bağlantısı kurulamadı. Proje klasöründe bir kez `npm run db:setup` çalıştırın ve geliştirme sunucusunu yeniden başlatın."
+          "Veritabanı bağlantısı kurulamadı. Yerelde BASLA.cmd çalıştırın; canlı sitede TURSO-VERCEL-KURULUM.cmd adımlarını uygulayın."
       },
       { status: 503 }
     );
@@ -100,11 +104,9 @@ export function routeErrorResponse(error: unknown): NextResponse {
   }
 
   if (error instanceof Error && error.message.includes("Environment variable not found: DATABASE_URL")) {
+    const msg = getDatabaseEnvProblem();
     return NextResponse.json(
-      {
-        message:
-          "DATABASE_URL ayarı bulunamadı. Proje kökünde .env dosyası oluşturun (.env.example içeriğini kopyalayın), geliştirme sunucusunu yeniden başlatın."
-      },
+      { message: msg ?? "Veritabanı bağlantı ayarı eksik veya hatalı." },
       { status: 503 }
     );
   }

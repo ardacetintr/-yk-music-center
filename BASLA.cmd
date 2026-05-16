@@ -25,8 +25,10 @@ if errorlevel 1 (
 )
 
 echo.
-echo  Tarayicida acin:  http://localhost:3000
+echo  Admin giris:      http://localhost:3000/admin/login
 echo  Durdurmak icin:   Ctrl+C
+echo.
+echo  (Internetten giris icin CANLI-SITE.cmd - istege bagli)
 echo.
 node node_modules\next\dist\bin\next dev
 pause

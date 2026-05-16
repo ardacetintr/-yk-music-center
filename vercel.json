@@ -1,10 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "node scripts/vercel-build.mjs",
-  "build": {
-    "env": {
-      "DATABASE_URL": "file:./prisma/vercel-build.db"
-    }
-  }
+  "buildCommand": "node scripts/vercel-build.mjs"
 }
