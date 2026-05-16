@@ -16,6 +16,14 @@ if not exist "node_modules\next\dist\bin\next" (
   )
 )
 
+call scripts\setup-local.cmd
+if errorlevel 1 (
+  echo.
+  echo  Kurulum tamamlanamadi. Yukaridaki hatayi kontrol edin.
+  pause
+  exit /b 1
+)
+
 echo.
 echo  Tarayicida acin:  http://localhost:3000
 echo  Durdurmak icin:   Ctrl+C
