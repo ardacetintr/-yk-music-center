@@ -23,11 +23,19 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo  Veritabani kontrol ediliyor...
-call npm.cmd run db:setup
+findstr /i "postgresql:// postgres://" .env >nul 2>&1
 if errorlevel 1 (
-  echo  Veritabani kurulumu basarisiz.
-  exit /b 1
+  echo.
+  echo  UYARI: .env icinde Postgres URL yok — sadece yerel sqlite kullaniliyor olabilir.
+  echo  Canli site icin: VERITABANI-AKTAR.cmd
+  echo.
+) else (
+  echo  Veritabani kontrol ediliyor...
+  call npm.cmd run db:setup
+  if errorlevel 1 (
+    echo  Veritabani kurulumu basarisiz.
+    exit /b 1
+  )
 )
 
 exit /b 0

@@ -1,31 +1,15 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-title Canli site - istege bagli
+title Canli site veritabani
 cls
 echo.
-echo  ============================================================
-echo    CANLI SITE (internetten giris) - Istege bagli
-echo  ============================================================
+echo  Turso GEREKMEZ.
 echo.
-echo  Sadece okulda admin girisi:
-echo    BASLA.cmd - http://localhost:3000/admin/login
-echo    Baska kurulum gerekmez.
-echo.
-echo  -----------------------------------------------------------
-echo  Musteri evinden Chrome ile giris:
-echo  -----------------------------------------------------------
-echo.
-echo  1) vercel.com - projeniz - Integrations - Turso - Add
-echo     (Otomatik baglanir, elle kopyalama yok)
-echo.
-echo  2) Environment Variables:
-echo     JWT_SECRET = en az 32 karakter
-echo     NEXT_PUBLIC_APP_URL = https://xxx.vercel.app
-echo.
-echo  3) Deployments - Redeploy
-echo.
-echo  Admin: 05064363881 / savasay1305
+echo  VERITABANI-AKTAR.cmd dosyasini calistirin:
+echo    - Vercel Storage - Postgres (tek tik)
+echo    - Yerel ogrenciler buluta kopyalanir
+echo    - Canli /admin listesi calisir
 echo.
 pause
 start https://vercel.com/dashboard

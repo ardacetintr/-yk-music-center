@@ -1,14 +1,19 @@
-/** Admin sayfalarında veritabanı okunamadığında gösterilecek metin. */
+import { resolveDatabaseUrl } from "@/lib/database-url";
+
 export function getAdminLoadErrorMessage(): string {
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL && !resolveDatabaseUrl()) {
     return (
-      "Canlı sitede öğrenci/öğretmen listesi için henüz veritabanı bağlı değil. " +
-      "Giriş yaptınız; tam panel için okul bilgisayarında BASLA.cmd kullanın " +
-      "(http://localhost:3000/admin) veya Vercel → Integrations → Turso ekleyin."
+      "Canlı site veritabanı bağlı değil. Vercel → Storage → Postgres → Create Database → " +
+      "projeye bağlayın → Redeploy. Yerel öğrencileri aktarmak için VERITABANI-AKTAR.cmd çalıştırın."
+    );
+  }
+  if (!resolveDatabaseUrl()) {
+    return (
+      "Veritabanı adresi eksik. VERITABANI-AKTAR.cmd dosyasını çalıştırın " +
+      "(Vercel Postgres URL .env dosyasına yazılır)."
     );
   }
   return (
-    "Veritabanı güncellenemedi. BASLA.cmd penceresini kapatıp (Ctrl+C) yeniden açın. " +
-    "Sorun sürerse proje klasöründe: npm run db:setup"
+    "Veritabanına bağlanılamadı. VERITABANI-AKTAR.cmd çalıştırın veya BASLA.cmd ile yeniden başlatın."
   );
 }

@@ -3,10 +3,10 @@ generator client {
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
-// SQLite: yerelde prisma/dev.db; Vercel'de Turso (libsql:// + DATABASE_AUTH_TOKEN).
+// PostgreSQL: Vercel Storage → Postgres (Turso gerekmez). Yerel .env ayni URL = ayni veri.
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 
   url = env("DATABASE_URL")
 }
@@ -148,7 +148,6 @@ model StudentLessonSlot {
   teacher Teacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
 
   @@index([studentId])
-
   @@index([scopeType])
 }
 
@@ -168,7 +167,6 @@ model StudentAbsence {
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
-
   @@index([absenceDate])
 }
 
