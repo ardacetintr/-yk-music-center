@@ -41,8 +41,9 @@ async function main() {
   const pgUrl = applyResolvedDatabaseUrl();
   if (!pgUrl) {
     console.error(
-      "\nHATA: .env dosyasinda DATABASE_URL (postgresql://...) yok.\n" +
-        "Vercel → Storage → Postgres → POSTGRES_PRISMA_URL → .env ye yapistirin.\n"
+      "\nHATA: Bu bilgisayardaki .env dosyasinda postgresql:// adresi yok.\n" +
+        "Vercel Storage → Neon → Connection string → .env icine DATABASE_URL=... yazin.\n" +
+        "(Vercel'deki kilitli DATABASE_URL'i kopyalayabilirsiniz; yerel .env ayri dosyadir.)\n"
     );
     process.exit(1);
   }
@@ -128,6 +129,8 @@ async function main() {
         parentName: s.parentName != null ? String(s.parentName) : null,
         parentPhone: s.parentPhone != null ? String(s.parentPhone) : null,
         primaryTeacherId: s.primaryTeacherId != null ? String(s.primaryTeacherId) : null,
+        paymentDueDay: 1,
+        paymentPaidMonth: null,
         createdAt: asDate(s.createdAt)
       }
     });

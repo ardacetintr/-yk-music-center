@@ -38,13 +38,56 @@ export function readLocalDbExport(): LocalDbExport | null {
   return JSON.parse(readFileSync(EXPORT_PATH, "utf8")) as LocalDbExport;
 }
 
-/** Yerel sqlite export → Postgres (mevcut veriyi siler, export ile doldurur). */
-export async function importLocalDbExport(prisma: PrismaClient): Promise<{
+/** Postgres/Neon → JSON yedek */
+export async function exportAllFromPrisma(prisma: PrismaClient): Promise<LocalDbExport> {
+  const [
+    users,
+    teachers,
+    students,
+    courses,
+    enrollments,
+    studentLessonSlots,
+    studentAbsences,
+    teacherApplications,
+    passwordResetCodes,
+    attendanceLogs
+  ] = await Promise.all([
+    prisma.user.findMany(),
+    prisma.teacher.findMany(),
+    prisma.student.findMany(),
+    prisma.course.findMany(),
+    prisma.enrollment.findMany(),
+    prisma.studentLessonSlot.findMany(),
+    prisma.studentAbsence.findMany(),
+    prisma.teacherApplication.findMany(),
+    prisma.passwordResetCode.findMany(),
+    prisma.attendanceLog.findMany()
+  ]);
+
+  return {
+    users: users as unknown as Record<string, unknown>[],
+    teachers: teachers as unknown as Record<string, unknown>[],
+    students: students as unknown as Record<string, unknown>[],
+    courses: courses as unknown as Record<string, unknown>[],
+    enrollments: enrollments as unknown as Record<string, unknown>[],
+    studentLessonSlots: studentLessonSlots as unknown as Record<string, unknown>[],
+    studentAbsences: studentAbsences as unknown as Record<string, unknown>[],
+    teacherApplications: teacherApplications as unknown as Record<string, unknown>[],
+    passwordResetCodes: passwordResetCodes as unknown as Record<string, unknown>[],
+    attendanceLogs: attendanceLogs as unknown as Record<string, unknown>[]
+  };
+}
+
+/** Postgres (mevcut veriyi siler, export ile doldurur). */
+export async function importLocalDbExport(
+  prisma: PrismaClient,
+  dataIn?: LocalDbExport | null
+): Promise<{
   users: number;
   students: number;
   teachers: number;
 } | null> {
-  const data = readLocalDbExport();
+  const data = dataIn ?? readLocalDbExport();
   if (!data?.users?.length) return null;
 
   const {
@@ -118,6 +161,9 @@ export async function importLocalDbExport(prisma: PrismaClient): Promise<{
         parentName: s.parentName != null ? String(s.parentName) : null,
         parentPhone: s.parentPhone != null ? String(s.parentPhone) : null,
         primaryTeacherId: s.primaryTeacherId != null ? String(s.primaryTeacherId) : null,
+        paymentDueDay:
+          s.paymentDueDay != null ? Math.min(31, Math.max(1, Number(s.paymentDueDay))) : 1,
+        paymentPaidMonth: s.paymentPaidMonth != null ? String(s.paymentPaidMonth) : null,
         createdAt: asDate(s.createdAt)
       }
     });

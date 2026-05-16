@@ -15,7 +15,9 @@
     "db:setup": "prisma db push && npm run prisma:seed",
     "db:export-local": "tsx --tsconfig tsconfig.scripts.json scripts/export-sqlite-to-json.ts",
     "db:import-export": "tsx --tsconfig tsconfig.scripts.json scripts/import-export-to-postgres.ts",
-    "db:upload-local": "tsx --tsconfig tsconfig.scripts.json scripts/upload-local-sqlite.ts"
+    "db:upload-local": "tsx --tsconfig tsconfig.scripts.json scripts/upload-local-sqlite.ts",
+    "db:copy-neon": "tsx --tsconfig tsconfig.scripts.json scripts/copy-neon-to-neon.ts",
+    "db:restore-neon": "tsx --tsconfig tsconfig.scripts.json scripts/restore-neon-backup.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

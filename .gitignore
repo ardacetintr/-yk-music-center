@@ -22,8 +22,11 @@ pnpm-debug.log*
 # local env files
 .env
 .env.local
+.env.backup*
+.env.oncesi-restore
 
 # prisma / sqlite
+prisma/data/neon-backup-eski.json
 prisma/dev.db
 prisma/dev.db-wal
 prisma/dev.db-shm

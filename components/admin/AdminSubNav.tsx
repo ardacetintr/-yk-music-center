@@ -7,6 +7,7 @@ type Tab =
   | "overview"
   | "schedule"
   | "absences"
+  | "accounting"
   | "register-student"
   | "register-teacher";
 
@@ -62,6 +63,9 @@ export default function AdminSubNav({ current }: { current: Tab }) {
         </Link>
         <Link href="/admin/absences" className={tabClass(current === "absences")}>
           Devamsızlık
+        </Link>
+        <Link href="/admin/accounting" className={tabClass(current === "accounting")}>
+          Muhasebe
         </Link>
 
         <div className="relative" ref={kayitRef}>
