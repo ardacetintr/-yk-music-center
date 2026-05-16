@@ -8,10 +8,8 @@ import {
 import { tryPersonnelAdminLogin } from "@/lib/admin-personnel-login";
 import { loginSchema } from "@/lib/validations";
 import { normalizePhone } from "@/lib/phone";
-import { findUserByLoginPhone } from "@/lib/auth-lookup";
 import { foldTurkishCharsForPassword } from "@/lib/password-login-normalize";
 import { readJsonBody, routeErrorResponse } from "@/lib/route-errors";
-import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/lib/roles";
 import { allowRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -27,9 +25,13 @@ async function resolveLoginUser(
   normalizedPhone: string,
   password: string | undefined
 ): Promise<LoginUser | "multi-parent" | "wrong-credentials" | null> {
-  let user: LoginUser | null = null;
+  const personnel = tryPersonnelAdminLogin(normalizedPhone, password ?? "");
+  if (personnel) return personnel;
 
   try {
+    const { findUserByLoginPhone } = await import("@/lib/auth-lookup");
+    const { prisma } = await import("@/lib/prisma");
+
     let dbUser = await findUserByLoginPhone(normalizedPhone);
 
     if (!dbUser) {
@@ -44,34 +46,27 @@ async function resolveLoginUser(
       }
     }
 
-    if (dbUser) {
-      const skipPassword = dbUser.role === UserRole.STUDENT || dbUser.role === UserRole.TEACHER;
-      if (skipPassword) {
-        user = dbUser;
-      } else {
-        const pwd = password ?? "";
-        if (pwd.length < 6) return "wrong-credentials";
-        let valid = await comparePassword(pwd, dbUser.passwordHash);
-        if (!valid) {
-          const folded = foldTurkishCharsForPassword(pwd);
-          if (folded !== pwd) {
-            valid = await comparePassword(folded, dbUser.passwordHash);
-          }
-        }
-        if (!valid) return "wrong-credentials";
-        user = dbUser;
+    if (!dbUser) return null;
+
+    const skipPassword = dbUser.role === UserRole.STUDENT || dbUser.role === UserRole.TEACHER;
+    if (skipPassword) return dbUser;
+
+    const pwd = password ?? "";
+    if (pwd.length < 6) return "wrong-credentials";
+
+    let valid = await comparePassword(pwd, dbUser.passwordHash);
+    if (!valid) {
+      const folded = foldTurkishCharsForPassword(pwd);
+      if (folded !== pwd) {
+        valid = await comparePassword(folded, dbUser.passwordHash);
       }
     }
+    if (!valid) return "wrong-credentials";
+
+    return dbUser;
   } catch {
-    user = null;
+    return null;
   }
-
-  if (user) return user;
-
-  const personnel = tryPersonnelAdminLogin(normalizedPhone, password ?? "");
-  if (personnel) return personnel;
-
-  return null;
 }
 
 export async function POST(request: Request) {

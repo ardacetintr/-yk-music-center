@@ -61,6 +61,12 @@ export function ensureAppEnv(): void {
       process.env.DATABASE_URL = getLocalDatabaseUrl();
     }
     bootstrapLocalDatabaseIfNeeded();
+  } else {
+    const url = process.env.DATABASE_URL?.trim() ?? "";
+    if (!url || url.startsWith("file:")) {
+      // Vercel'de eski file:./dev.db ayari admin girisini bozar; admin DB kullanmaz.
+      process.env.DATABASE_URL = "file:/tmp/yk-vercel-no-db.db";
+    }
   }
 
   if (!process.env.JWT_SECRET?.trim() && !strictProd) {

@@ -74,15 +74,14 @@ export function routeErrorResponse(error: unknown): NextResponse {
       return NextResponse.json(
         {
           message:
-            "Veritabanı bağlantısı kurulamadı. BASLA.cmd ile sunucuyu yeniden başlatın; sorun sürerse projeyi kapatıp tekrar açın."
+            "Giriş şu an tamamlanamadı. Admin için: 05064363881 / savasay1305 — birkaç dakika sonra tekrar deneyin veya siteyi yenileyin."
         },
         { status: 503 }
       );
     }
     return NextResponse.json(
       {
-        message:
-          "Veritabanı bağlantısı kurulamadı. BASLA.cmd ile sunucuyu yeniden başlatın."
+        message: "Geçici bir sunucu hatası. Lütfen sayfayı yenileyip tekrar deneyin."
       },
       { status: 503 }
     );
@@ -101,7 +100,8 @@ export function routeErrorResponse(error: unknown): NextResponse {
   if (error instanceof Error && error.message.includes("Environment variable not found: DATABASE_URL")) {
     return NextResponse.json(
       {
-        message: "Veritabanı hazır değil. BASLA.cmd dosyasına çift tıklayıp tekrar deneyin."
+        message:
+          "Giriş şu an tamamlanamadı. Admin: 05064363881 / savasay1305 — sayfayı yenileyip tekrar deneyin."
       },
       { status: 503 }
     );
