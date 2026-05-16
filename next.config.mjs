@@ -16,6 +16,9 @@ const nextConfig = {
   typedRoutes: true,
   serverExternalPackages: ["docx", "pdfmake"],
   poweredByHeader: false,
+  eslint: {
+    dirs: ["app", "components", "lib", "middleware.ts"],
+  },
   async headers() {
     const headers = [...securityHeaders];
     if (isProd) {

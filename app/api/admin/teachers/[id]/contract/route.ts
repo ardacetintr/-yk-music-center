@@ -7,6 +7,7 @@ import { resolveTeacherContractTemplatePath } from "@/lib/teacher-contract-templ
 import { fillTeacherContractTemplate } from "@/lib/teacher-contract-fill-text";
 import { filledContractTextToDocxBuffer } from "@/lib/teacher-contract-build-docx";
 import { filledContractTextToPdfBuffer } from "@/lib/teacher-contract-build-pdf";
+import { bufferToBodyInit } from "@/lib/binary-body";
 import { access } from "fs/promises";
 import { constants as FsConstants } from "fs";
 
@@ -114,7 +115,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const safeFile = `is-sozlesmesi-${teacherId.slice(-12)}.${filenameSuffix}`;
 
-  return new NextResponse(new Uint8Array(buffer), {
+  return new NextResponse(bufferToBodyInit(buffer), {
     status: 200,
     headers: {
       "Content-Type": contentType,
