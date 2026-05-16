@@ -1,22 +1,17 @@
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 
 const globalForDb = globalThis as { __ykDbBootstrapped?: boolean };
 
-/** Prisma schema prisma/ altında; dosya yolu mutlak olmalı. */
+/** Prisma: yol schema dosyasına (prisma/) göredir → prisma/dev.db */
 export function getLocalDatabaseUrl(): string {
-  const dbPath = join(process.cwd(), "prisma", "dev.db");
-  return `file:${dbPath.replace(/\\/g, "/")}`;
+  return "file:./dev.db";
 }
 
+/** Yerel geliştirmede şema + seed (BASLA.cmd). */
 export function bootstrapLocalDatabaseIfNeeded(): void {
-  if (process.env.VERCEL) return;
+  if (process.env.VERCEL === "1" || process.env.VERCEL === "true") return;
   if (globalForDb.__ykDbBootstrapped) return;
   globalForDb.__ykDbBootstrapped = true;
-
-  const dbPath = join(process.cwd(), "prisma", "dev.db");
-  if (existsSync(dbPath)) return;
 
   const url = getLocalDatabaseUrl();
   process.env.DATABASE_URL = url;
@@ -30,6 +25,6 @@ export function bootstrapLocalDatabaseIfNeeded(): void {
     });
     execSync("npm run prisma:seed", { cwd: process.cwd(), env, stdio: "pipe" });
   } catch (err) {
-    console.error("[yk-music-center] Yerel veritabani kurulamadi:", err);
+    console.error("[yk-music-center] Yerel veritabani:", err);
   }
 }

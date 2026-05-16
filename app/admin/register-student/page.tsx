@@ -6,6 +6,7 @@ import AdminAddStudentForm from "@/components/forms/AdminAddStudentForm";
 import AdminSubNav from "@/components/admin/AdminSubNav";
 import { greetingDisplayName } from "@/lib/display-name";
 import { addStudent } from "@/app/admin/register/actions";
+import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 
 export default async function AdminRegisterStudentPage() {
   const session = await getServerSession();
@@ -22,8 +23,7 @@ export default async function AdminRegisterStudentPage() {
     });
   } catch (e) {
     console.error(e);
-    loadError =
-      "Veritabanı hatası. `npx prisma db push` ve `npx prisma generate` çalıştırıp sunucuyu yeniden başlatın.";
+    loadError = getAdminLoadErrorMessage();
   }
 
   const teacherSelectOptions = teachers.map((t) => ({ id: t.id, name: t.user.name }));

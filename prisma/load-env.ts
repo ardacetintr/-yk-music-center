@@ -55,11 +55,10 @@ export function ensureAppEnv(): void {
   const strictProd =
     process.env.VERCEL_ENV === "production" || process.env.ENFORCE_STRONG_JWT_SECRET === "1";
 
-  if (!process.env.VERCEL) {
-    const url = process.env.DATABASE_URL?.trim() ?? "";
-    if (!url || url.startsWith("file:")) {
-      process.env.DATABASE_URL = getLocalDatabaseUrl();
-    }
+  const onVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
+
+  if (!onVercel) {
+    process.env.DATABASE_URL = getLocalDatabaseUrl();
     bootstrapLocalDatabaseIfNeeded();
   } else {
     const url = process.env.DATABASE_URL?.trim() ?? "";

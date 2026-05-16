@@ -13,7 +13,7 @@ if not exist ".env" (
 )
 
 if not exist "node_modules\prisma" (
-  echo  Prisma paketleri eksik, once: npm.cmd install
+  echo  Paketler eksik, once: npm.cmd install
   exit /b 1
 )
 
@@ -23,14 +23,11 @@ if errorlevel 1 (
   exit /b 1
 )
 
-if not exist "prisma\dev.db" (
-  echo  Veritabani ilk kez kuruluyor (1-2 dk)...
-  call npm.cmd run db:setup
-  if errorlevel 1 (
-    echo  Veritabani kurulumu basarisiz.
-    exit /b 1
-  )
-  echo  Veritabani hazir.
+echo  Veritabani kontrol ediliyor...
+call npm.cmd run db:setup
+if errorlevel 1 (
+  echo  Veritabani kurulumu basarisiz.
+  exit /b 1
 )
 
 exit /b 0

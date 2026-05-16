@@ -18,6 +18,7 @@ import {
   updateLessonSlotInline
 } from "@/app/admin/lesson-schedules/actions";
 import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
+import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 
 type StudentWithUser = Prisma.StudentGetPayload<{ include: { user: true; primaryTeacher: { include: { user: true } } } }>;
 type TeacherWithUser = Prisma.TeacherGetPayload<{ include: { user: true } }>;
@@ -115,8 +116,7 @@ export default async function AdminPage() {
       teachers: teachersRes.status === "rejected" ? teachersRes.reason : null,
       slots: slotsRes.status === "rejected" ? slotsRes.reason : null
     });
-    loadError =
-      "Bazı veriler okunamadı (şema uyumsuz olabilir). Proje klasöründe `npx prisma db push` çalıştırın; ardından `npx prisma generate` ve geliştirme sunucusunu yeniden başlatın.";
+    loadError = getAdminLoadErrorMessage();
   }
 
   const teacherSelectOptions = teachers.map((t) => ({ id: t.id, name: t.user.name }));

@@ -13,6 +13,7 @@ import LessonScheduleProgramViews from "@/components/admin/LessonScheduleProgram
 import LessonSlotDersSelect from "@/components/forms/LessonSlotDersSelect";
 import LessonSlotEditForm from "@/components/forms/LessonSlotEditForm";
 import LessonScheduleFlashToast from "@/components/admin/LessonScheduleFlashToast";
+import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 
 function toastFromSearchParams(searchParams?: Record<string, string | string[] | undefined>) {
   const raw = searchParams?.toast;
@@ -62,8 +63,7 @@ export default async function AdminLessonSchedulesPage({
     slots = sl;
   } catch (e) {
     console.error(e);
-    loadError =
-      "Veritabanı hatası. `npx prisma db push` ve `npx prisma generate` çalıştırıp sunucuyu yeniden başlatın.";
+    loadError = getAdminLoadErrorMessage();
   }
 
   function timeRange(slot: { startTime: string; endTime: string | null }) {

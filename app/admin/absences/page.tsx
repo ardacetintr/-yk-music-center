@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import AdminSubNav from "@/components/admin/AdminSubNav";
 import { greetingDisplayName } from "@/lib/display-name";
 import { addStudentAbsence, deleteStudentAbsence } from "./actions";
+import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 
 export default async function AdminAbsencesPage() {
   const session = await getServerSession();
@@ -34,8 +35,7 @@ export default async function AdminAbsencesPage() {
     absences = a;
   } catch (e) {
     console.error(e);
-    loadError =
-      "Veritabanı hatası. `npx prisma db push` ve `npx prisma generate` çalıştırıp sunucuyu yeniden başlatın.";
+    loadError = getAdminLoadErrorMessage();
   }
 
   function formatTrDate(iso: string) {
