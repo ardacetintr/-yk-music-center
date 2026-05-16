@@ -5,23 +5,77 @@ import {
   setSessionCookie,
   type SessionPayload
 } from "@/lib/auth";
+import { tryPersonnelAdminLogin } from "@/lib/admin-personnel-login";
 import { loginSchema } from "@/lib/validations";
 import { normalizePhone } from "@/lib/phone";
 import { findUserByLoginPhone } from "@/lib/auth-lookup";
 import { foldTurkishCharsForPassword } from "@/lib/password-login-normalize";
 import { readJsonBody, routeErrorResponse } from "@/lib/route-errors";
-import { getDatabaseEnvProblem } from "@/lib/database-env";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/lib/roles";
 import { allowRateLimit, getClientIp } from "@/lib/rate-limit";
 
-export async function POST(request: Request) {
+type LoginUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  passwordHash: string;
+};
+
+async function resolveLoginUser(
+  normalizedPhone: string,
+  password: string | undefined
+): Promise<LoginUser | "multi-parent" | "wrong-credentials" | null> {
+  let user: LoginUser | null = null;
+
   try {
-    const dbProblem = getDatabaseEnvProblem();
-    if (dbProblem) {
-      return NextResponse.json({ message: dbProblem }, { status: 503 });
+    let dbUser = await findUserByLoginPhone(normalizedPhone);
+
+    if (!dbUser) {
+      const byParent = await prisma.student.findMany({
+        where: { parentPhone: normalizedPhone },
+        include: { user: true }
+      });
+      if (byParent.length === 1) {
+        dbUser = byParent[0].user;
+      } else if (byParent.length > 1) {
+        return "multi-parent";
+      }
     }
 
+    if (dbUser) {
+      const skipPassword = dbUser.role === UserRole.STUDENT || dbUser.role === UserRole.TEACHER;
+      if (skipPassword) {
+        user = dbUser;
+      } else {
+        const pwd = password ?? "";
+        if (pwd.length < 6) return "wrong-credentials";
+        let valid = await comparePassword(pwd, dbUser.passwordHash);
+        if (!valid) {
+          const folded = foldTurkishCharsForPassword(pwd);
+          if (folded !== pwd) {
+            valid = await comparePassword(folded, dbUser.passwordHash);
+          }
+        }
+        if (!valid) return "wrong-credentials";
+        user = dbUser;
+      }
+    }
+  } catch {
+    user = null;
+  }
+
+  if (user) return user;
+
+  const personnel = tryPersonnelAdminLogin(normalizedPhone, password ?? "");
+  if (personnel) return personnel;
+
+  return null;
+}
+
+export async function POST(request: Request) {
+  try {
     const ip = getClientIp(request);
     if (!allowRateLimit(`login:${ip}`, 40, 15 * 60 * 1000)) {
       return NextResponse.json(
@@ -35,62 +89,30 @@ export async function POST(request: Request) {
     const parsed = loginSchema.parse(raw.body);
 
     const normalizedPhone = normalizePhone(parsed.phone);
-    let user = await findUserByLoginPhone(normalizedPhone);
+    const result = await resolveLoginUser(normalizedPhone, parsed.password);
 
-    if (!user) {
-      const byParent = await prisma.student.findMany({
-        where: { parentPhone: normalizedPhone },
-        include: { user: true }
-      });
-      if (byParent.length === 1) {
-        user = byParent[0].user;
-      } else if (byParent.length > 1) {
-        return NextResponse.json(
-          {
-            message:
-              "Bu veli numarasına bağlı birden fazla öğrenci kaydı var. Giriş için yöneticiye başvurun."
-          },
-          { status: 401 }
-        );
-      }
+    if (result === "multi-parent") {
+      return NextResponse.json(
+        {
+          message:
+            "Bu veli numarasına bağlı birden fazla öğrenci kaydı var. Giriş için yöneticiye başvurun."
+        },
+        { status: 401 }
+      );
     }
 
-    if (!user) {
-      return NextResponse.json({ message: "Telefon veya şifre hatalı." }, { status: 401 });
-    }
-
-    const skipPassword = user.role === UserRole.STUDENT || user.role === UserRole.TEACHER;
-
-    let valid = skipPassword;
-    if (!skipPassword) {
-      const pwd = parsed.password ?? "";
-      if (pwd.length < 6) {
-        return NextResponse.json(
-          { message: "Yönetici girişi için şifre gereklidir (en az 6 karakter)." },
-          { status: 401 }
-        );
-      }
-      valid = await comparePassword(pwd, user.passwordHash);
-      if (!valid) {
-        const folded = foldTurkishCharsForPassword(pwd);
-        if (folded !== pwd) {
-          valid = await comparePassword(folded, user.passwordHash);
-        }
-      }
-    }
-
-    if (!valid) {
+    if (!result || result === "wrong-credentials") {
       return NextResponse.json({ message: "Telefon veya şifre hatalı." }, { status: 401 });
     }
 
     const token = await createSession({
-      userId: user.id,
-      role: user.role as SessionPayload["role"],
-      email: user.email,
-      name: user.name
+      userId: result.id,
+      role: result.role as SessionPayload["role"],
+      email: result.email,
+      name: result.name
     });
 
-    const response = NextResponse.json({ ok: true, role: user.role });
+    const response = NextResponse.json({ ok: true, role: result.role });
     setSessionCookie(response, token);
     return response;
   } catch (error) {

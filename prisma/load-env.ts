@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
+import { bootstrapLocalDatabaseIfNeeded, getLocalDatabaseUrl } from "../lib/local-database";
 
-const DEV_DATABASE_URL = "file:./dev.db";
 const DEV_JWT_SECRET = "yk-music-center-dev-secret-min-32-chars-change-in-production";
 
 /** tsx ile doğrudan seed çalıştırılırken Next.js .env yüklemez; kök .env okunur. */
@@ -55,8 +55,12 @@ export function ensureAppEnv(): void {
   const strictProd =
     process.env.VERCEL_ENV === "production" || process.env.ENFORCE_STRONG_JWT_SECRET === "1";
 
-  if (!process.env.DATABASE_URL?.trim() && !strictProd && !process.env.VERCEL) {
-    process.env.DATABASE_URL = DEV_DATABASE_URL;
+  if (!process.env.VERCEL) {
+    const url = process.env.DATABASE_URL?.trim() ?? "";
+    if (!url || url.startsWith("file:")) {
+      process.env.DATABASE_URL = getLocalDatabaseUrl();
+    }
+    bootstrapLocalDatabaseIfNeeded();
   }
 
   if (!process.env.JWT_SECRET?.trim() && !strictProd) {

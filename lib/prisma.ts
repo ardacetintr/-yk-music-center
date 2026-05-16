@@ -1,5 +1,8 @@
 import "../prisma/load-env";
+import { bootstrapLocalDatabaseIfNeeded } from "@/lib/local-database";
 import { PrismaClient } from "@prisma/client";
+
+bootstrapLocalDatabaseIfNeeded();
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
 import { createClient } from "@libsql/client";
 
