@@ -126,7 +126,8 @@
     radial-gradient(ellipse 65% 50% at -15% 72%, rgba(39, 39, 42, 0.58), transparent 55%),
     radial-gradient(ellipse 50% 40% at 70% 88%, rgba(127, 29, 29, 0.2), transparent 50%),
     linear-gradient(175deg, rgba(0, 0, 0, 0.72) 0%, rgba(5, 5, 6, 0.76) 42%, rgba(8, 8, 9, 0.8) 100%);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-size: 110% 110%, 110% 110%, 110% 110%, 100% 100%, 100% 100%;
+  animation: liquidBgDrift 32s ease-in-out infinite;
 }
 
 .stage::before {
@@ -144,10 +145,10 @@
 .glowOrb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(40px);
+  filter: blur(56px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.85;
+  animation: liquidShimmer 18s ease-in-out infinite;
 }
 
 .glowOrbBrand {
@@ -334,8 +335,10 @@
   width: 100%;
   border-radius: clamp(1.5rem, 4.5vw, 2.25rem);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.55) 100%),
-    rgba(255, 255, 255, 0.5);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.28) 100%),
+    rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow:
     0 0 0 0.5px rgba(0, 0, 0, 0.06),
@@ -435,4 +438,13 @@
 
 .fadeUpDelay2 {
   animation-delay: 0.34s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage,
+  .glowOrb,
+  .waveShelfInner,
+  .waveTrack {
+    animation: none !important;
+  }
 }

@@ -17,28 +17,8 @@ body.theme-night {
   color: #f4f4f5;
 }
 
-/* Statik arka plan: blur + onlarca animasyon yerine GPU-dostu gradient */
-.site-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 90% 55% at 8% -5%, rgba(220, 38, 38, 0.28), transparent 58%),
-    radial-gradient(ellipse 70% 45% at 92% 18%, rgba(255, 255, 255, 0.07), transparent 55%),
-    radial-gradient(ellipse 80% 50% at 45% 100%, rgba(24, 24, 27, 0.85), transparent 60%),
-    #000000;
-}
-
-body.theme-day .site-bg {
-  background:
-    radial-gradient(ellipse 90% 55% at 10% 0%, rgba(220, 38, 38, 0.12), transparent 55%),
-    radial-gradient(ellipse 70% 45% at 90% 30%, rgba(148, 163, 184, 0.15), transparent 50%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-}
-
 .site-shell {
-  contain: layout style;
+  isolation: isolate;
 }
 
 @keyframes blobMotion {
@@ -106,13 +86,13 @@ body.theme-day .site-bg {
 }
 
 .card {
-  @apply rounded-2xl border border-zinc-800 bg-zinc-950/95 p-6 shadow-lg shadow-black/25;
-  background-image: linear-gradient(135deg, rgba(220, 38, 38, 0.06), rgba(24, 24, 27, 0.85));
-  transition: border-color 0.2s ease;
+  @apply rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 shadow-xl shadow-black/30 backdrop-blur-sm;
+  background-image: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(24, 24, 27, 0.7));
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card:hover {
-  @apply border-brand-500/50;
+  @apply border-brand-500/60 shadow-2xl shadow-black/35;
 }
 
 .logo-badge {
@@ -136,8 +116,9 @@ body.theme-day .site-bg {
 }
 
 .global-blob {
-  @apply absolute rounded-full blur-3xl;
-  animation: blobMotion 14s ease-in-out infinite;
+  @apply absolute rounded-full blur-2xl;
+  animation: blobMotion 16s ease-in-out infinite;
+  will-change: transform;
 }
 
 .global-blob-red {
@@ -185,9 +166,11 @@ body.theme-day .site-bg {
 }
 
 .liquid-glass-nav {
-  background: rgba(12, 12, 14, 0.92);
-  border-color: rgba(63, 63, 70, 0.9);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
 }
 
 .music-note {
@@ -230,9 +213,8 @@ body.theme-day .card:hover {
 }
 
 body.theme-day .liquid-glass-nav {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.88);
   border-color: rgba(203, 213, 225, 0.9);
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
 body.theme-day .music-note {
@@ -269,16 +251,22 @@ body.theme-day .hero-overlay {
 
 body.theme-day .hero-info-box {
   border-color: rgba(148, 163, 184, 0.45);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .hero-info-box {
-  transition: border-color 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .hero-info-box:hover {
   border-color: rgba(220, 38, 38, 0.45);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+}
+
+body.theme-day .hero-info-box:hover {
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.14);
 }
 
 body.theme-day .hero-info-title {
@@ -336,6 +324,19 @@ body.theme-day .login-tempo-logo {
   opacity: 0.98;
 }
 
+body.theme-night:has([data-liquid-page]) .music-notes-layer,
+body.theme-day:has([data-liquid-page]) .music-notes-layer {
+  z-index: 3;
+}
+
+body.theme-night:has([data-liquid-page]) .music-note {
+  animation-name: noteDriftLiquid;
+  font-weight: 800;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.55),
+    0 0 24px rgba(220, 38, 38, 0.45);
+}
+
 body.theme-night:has([data-liquid-page]) .site-shell,
 body.theme-day:has([data-liquid-page]) .site-shell {
   z-index: 25;
@@ -343,13 +344,11 @@ body.theme-day:has([data-liquid-page]) .site-shell {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .global-blob,
+  .music-note,
+  .hero-blob,
+  .soft-float {
+    animation: none !important;
   }
 }
 
