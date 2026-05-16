@@ -20,6 +20,43 @@ function buildUrlFromPgEnv(): string | null {
   return `postgresql://${encUser}:${encPass}@${host}:${port}/${database}?sslmode=require`;
 }
 
+/** Neon özel önek kullanırsa (ör. NEON_DATABASE_URL) veya elle eklenen diğer anahtarlar */
+function findPostgresUrlInAllEnv(onVercel: boolean): string | null {
+  const preferredKeyHints = [
+    "POSTGRES_PRISMA_URL",
+    "POSTGRES_URL",
+    "DATABASE_URL_UNPOOLED",
+    "NEON_DATABASE_URL",
+    "DATABASE_URL"
+  ];
+
+  const entries = Object.entries(process.env).filter(
+    ([, v]) => v && isPostgresDatabaseUrl(v) && !(onVercel && isLocalFileDatabaseUrl(v))
+  ) as [string, string][];
+
+  if (!entries.length) return null;
+
+  for (const hint of preferredKeyHints) {
+    const hit = entries.find(([k]) => k === hint || k.endsWith(`_${hint}`));
+    if (hit) return hit[1].trim();
+  }
+
+  const scored = entries
+    .map(([key, value]) => {
+      let score = 0;
+      const upper = key.toUpperCase();
+      if (upper.includes("PRISMA")) score += 4;
+      if (upper.includes("POSTGRES") || upper.includes("NEON")) score += 3;
+      if (upper.includes("DATABASE")) score += 2;
+      if (upper.includes("POOLED") || value.includes("-pooler")) score += 1;
+      if (upper.includes("UNPOOLED")) score -= 1;
+      return { key, value: value.trim(), score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return scored[0]?.value ?? null;
+}
+
 /** Vercel Neon / Postgres / elle girilen adres */
 export function resolveDatabaseUrl(): string | null {
   const onVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
@@ -42,6 +79,9 @@ export function resolveDatabaseUrl(): string | null {
   const fromPg = buildUrlFromPgEnv();
   if (fromPg) return fromPg;
 
+  const fromScan = findPostgresUrlInAllEnv(onVercel);
+  if (fromScan) return fromScan;
+
   if (!onVercel) {
     const direct = process.env.DATABASE_URL?.trim();
     if (direct && !isLocalFileDatabaseUrl(direct) && isPostgresDatabaseUrl(direct)) return direct;
@@ -63,4 +103,46 @@ export function applyResolvedDatabaseUrl(): string | null {
   }
 
   return null;
+}
+
+/** Admin tanı — şifre göstermez */
+export function getDatabaseEnvDiagnostics(): {
+  onVercel: boolean;
+  vercelEnv: string | undefined;
+  resolved: boolean;
+  resolvedFromKey: string | null;
+  postgresKeys: string[];
+  blockingFileDatabaseUrl: boolean;
+} {
+  const onVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
+  const postgresKeys: string[] = [];
+  let blockingFileDatabaseUrl = false;
+
+  for (const [key, value] of Object.entries(process.env)) {
+    if (!value?.trim()) continue;
+    if (key === "DATABASE_URL" && isLocalFileDatabaseUrl(value)) {
+      blockingFileDatabaseUrl = true;
+    }
+    if (isPostgresDatabaseUrl(value)) postgresKeys.push(key);
+  }
+
+  const resolvedUrl = resolveDatabaseUrl();
+  let resolvedFromKey: string | null = null;
+  if (resolvedUrl) {
+    for (const [key, value] of Object.entries(process.env)) {
+      if (value?.trim() === resolvedUrl) {
+        resolvedFromKey = key;
+        break;
+      }
+    }
+  }
+
+  return {
+    onVercel,
+    vercelEnv: process.env.VERCEL_ENV,
+    resolved: Boolean(resolvedUrl),
+    resolvedFromKey,
+    postgresKeys: postgresKeys.sort(),
+    blockingFileDatabaseUrl
+  };
 }

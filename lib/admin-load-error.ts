@@ -1,12 +1,17 @@
-import { resolveDatabaseUrl } from "@/lib/database-url";
+import { getDatabaseEnvDiagnostics, resolveDatabaseUrl } from "@/lib/database-url";
 
 export function getAdminLoadErrorMessage(): string {
   if (process.env.VERCEL && !resolveDatabaseUrl()) {
+    const d = getDatabaseEnvDiagnostics();
+    if (d.blockingFileDatabaseUrl && d.postgresKeys.length > 0) {
+      return (
+        "Neon bağlı görünüyor ama DATABASE_URL hâlâ file:./dev.db (yerel sqlite). " +
+        "Vercel → Settings → Environment Variables → DATABASE_URL satırını silin veya Neon postgres adresiyle değiştirin → Redeploy."
+      );
+    }
     return (
-      "Canlı sitede veritabanı bağlı değil (Neon Postgres gerekir, Turso değil). " +
-      "Vercel → Integrations → Neon kurun ve projeye bağlayın. " +
-      "Settings → Environment Variables: DATABASE_URL=file:./dev.db varsa silin → Redeploy. " +
-      "Sonra /admin sayfasını yenileyin; öğrenciler otomatik yüklenir."
+      "Canlı sitede Postgres adresi okunamıyor. Neon projeye bağlı olsa bile Production ortamına " +
+      "işlendiğinden emin olun (Integrations → Neon → Projects). Redeploy sonrası /admin → Verileri yükle."
     );
   }
   if (!resolveDatabaseUrl()) {
