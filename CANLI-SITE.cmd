@@ -7,7 +7,7 @@ echo.
 echo  Turso GEREKMEZ.
 echo.
 echo  VERITABANI-AKTAR.cmd dosyasini calistirin:
-echo    - Vercel Storage - Postgres (tek tik)
+echo    - Vercel Integrations - Neon (Postgres, ucretsiz plan)
 echo    - Yerel ogrenciler buluta kopyalanir
 echo    - Canli /admin listesi calisir
 echo.

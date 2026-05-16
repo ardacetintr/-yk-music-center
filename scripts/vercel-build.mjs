@@ -1,15 +1,27 @@
 import { execSync } from "node:child_process";
 
 function pickPostgresUrl() {
+  const skipFile = (u) =>
+    u && !u.startsWith("file:") && !u.startsWith("sqlite:");
   const candidates = [
-    process.env.DATABASE_URL,
     process.env.POSTGRES_PRISMA_URL,
     process.env.POSTGRES_URL,
-    process.env.DATABASE_URL_UNPOOLED
+    process.env.DATABASE_URL_UNPOOLED,
+    process.env.NEON_DATABASE_URL,
+    process.env.DATABASE_URL
   ];
   for (const raw of candidates) {
     const u = raw?.trim();
-    if (u?.startsWith("postgresql://") || u?.startsWith("postgres://")) return u;
+    if (!skipFile(u)) continue;
+    if (u.startsWith("postgresql://") || u.startsWith("postgres://")) return u;
+  }
+  const host = process.env.PGHOST?.trim();
+  const user = process.env.PGUSER?.trim();
+  const password = process.env.PGPASSWORD?.trim();
+  const database = process.env.PGDATABASE?.trim();
+  if (host && user && password && database) {
+    const port = process.env.PGPORT?.trim() || "5432";
+    return `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/${database}?sslmode=require`;
   }
   return null;
 }
@@ -41,12 +53,17 @@ if (pgUrl) {
       env: nextEnv
     });
     execSync("npm run prisma:seed", { stdio: "inherit", env: nextEnv });
+    try {
+      execSync("npm run db:import-export", { stdio: "inherit", env: nextEnv });
+    } catch (e) {
+      console.warn("Yerel ogrenci import uyarisi:", e.message ?? e);
+    }
   } catch (e) {
     console.warn("DB push/seed uyarisi:", e.message ?? e);
   }
 } else {
   delete nextEnv.DATABASE_URL;
-  console.log("Postgres yok — next build (Vercel Storage → Postgres ekleyin).");
+  console.log("Postgres yok — Vercel Integrations → Neon → projeye baglayin, Redeploy.");
 }
 
 console.log("2/2 next build...");

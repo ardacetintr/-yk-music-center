@@ -8,11 +8,11 @@ echo  ============================================================
 echo    OGRENCILERI CANLI SITEYE AKTAR (Turso gerekmez)
 echo  ============================================================
 echo.
-echo  ADIM 1) vercel.com - Projeniz - Storage - Create Database
-echo         "Postgres" secin - projeye baglayin
+echo  ADIM 1) vercel.com - Integrations - Neon - Install
+echo         Projeyi baglayin. Settings - Environment Variables:
+echo         DATABASE_URL=file:./dev.db VARSA SILIN (canli site bozulur)
 echo.
-echo  ADIM 2) Storage - Postgres - .env.local sekmesi
-echo         POSTGRES_PRISMA_URL satirini KOPYALA
+echo  ADIM 2) Neon - DATABASE_URL veya POSTGRES_PRISMA_URL KOPYALA
 echo.
 echo  ADIM 3) Bu klasorde .env dosyasi acin, su satiri ekleyin:
 echo         DATABASE_URL=(kopyaladiginiz adres)
