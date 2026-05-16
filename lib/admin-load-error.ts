@@ -5,8 +5,9 @@ export function getAdminLoadErrorMessage(): string {
     const d = getDatabaseEnvDiagnostics();
     if (d.blockingFileDatabaseUrl && d.postgresKeys.length > 0) {
       return (
-        "Neon bağlı görünüyor ama DATABASE_URL hâlâ file:./dev.db (yerel sqlite). " +
-        "Vercel → Settings → Environment Variables → DATABASE_URL satırını silin veya Neon postgres adresiyle değiştirin → Redeploy."
+        "Neon bağlı ama DATABASE_URL kilitli ve hâlâ file:./dev.db. " +
+        "Vercel → Storage → Neon → Projects: projeyi çıkarıp tekrar bağlayın → Redeploy. " +
+        "(Kilitli satırı elle silmeye gerek yok; Neon yeniden bağlanınca postgresql olur.)"
       );
     }
     return (

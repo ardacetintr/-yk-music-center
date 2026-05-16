@@ -8,11 +8,13 @@ echo  ============================================================
 echo    OGRENCILERI CANLI SITEYE AKTAR (Turso gerekmez)
 echo  ============================================================
 echo.
-echo  ADIM 1) vercel.com - Integrations - Neon - Install
-echo         Projeyi baglayin. Settings - Environment Variables:
-echo         DATABASE_URL=file:./dev.db VARSA SILIN (canli site bozulur)
+echo  ADIM 1) Neon projeye bagli olsun (Integrations - Neon)
+echo         DATABASE_URL KILITLI gorunur — NORMAL, Neon yonetir.
+echo         Deger postgresql://... olmali (file:./dev.db OLMAMALI).
+echo         Kilitli satiri silmeye calismayin. Sorun: VERCEL-NEON-KILIT.cmd
 echo.
-echo  ADIM 2) Neon - DATABASE_URL veya POSTGRES_PRISMA_URL KOPYALA
+echo  ADIM 2) Neon Console veya Vercel Storage - Neon - Connection string
+echo         (sadece bu bilgisayarda .env icin) KOPYALA
 echo.
 echo  ADIM 3) Bu klasorde .env dosyasi acin, su satiri ekleyin:
 echo         DATABASE_URL=(kopyaladiginiz adres)
