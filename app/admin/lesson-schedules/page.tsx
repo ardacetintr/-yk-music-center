@@ -29,8 +29,9 @@ type SlotWithRelations = Prisma.StudentLessonSlotGetPayload<{
 export default async function AdminLessonSchedulesPage({
   searchParams
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const session = await getServerSession();
   if (!session) redirect("/admin/login");
   if (session.role !== "ADMIN") redirect("/dashboard");
@@ -71,7 +72,7 @@ export default async function AdminLessonSchedulesPage({
 
   const studentOptions = students.map((st) => ({ id: st.id, name: st.user.name }));
   const teacherOptions = teachers.map((th) => ({ id: th.id, name: th.user.name }));
-  const toastKey = toastFromSearchParams(searchParams);
+  const toastKey = toastFromSearchParams(resolvedSearchParams);
 
   return (
     <div className="space-y-6">

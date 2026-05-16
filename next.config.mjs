@@ -13,10 +13,8 @@ const securityHeaders = [
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-    serverComponentsExternalPackages: ["docx", "pdfmake"]
-  },
+  typedRoutes: true,
+  serverExternalPackages: ["docx", "pdfmake"],
   poweredByHeader: false,
   async headers() {
     const headers = [...securityHeaders];

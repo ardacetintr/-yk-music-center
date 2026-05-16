@@ -5,23 +5,25 @@ import { phoneToEmail } from "@/lib/phone";
 import { serializeTeacherInstruments } from "@/lib/teacher-instruments";
 import { readJsonBody, routeErrorResponse } from "@/lib/route-errors";
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await prisma.teacher.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.teacher.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ message: "Kayıt bulunamadı." }, { status: 404 });
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const raw = await readJsonBody(request);
     if (!raw.ok) return raw.response;
     const parsed = teacherUpdateSchema.parse(raw.body);
 
     const teacher = await prisma.teacher.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { userId: true }
     });
     if (!teacher) {
@@ -64,19 +66,19 @@ export async function PATCH(request: Request, { params }: { params: { id: string
           data: { email: phoneToEmail(parsed.phone) }
         }),
         prisma.teacher.update({
-          where: { id: params.id },
+          where: { id: id },
           data
         })
       ]);
     } else if (Object.keys(data).length > 0) {
       await prisma.teacher.update({
-        where: { id: params.id },
+        where: { id: id },
         data
       });
     }
 
     const updated = await prisma.teacher.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: { user: true }
     });
     return NextResponse.json(updated);

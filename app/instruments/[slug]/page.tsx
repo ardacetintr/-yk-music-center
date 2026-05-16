@@ -1,8 +1,13 @@
 import { notFound } from "next/navigation";
 import { instruments } from "@/lib/content";
 
-export default function InstrumentDetailPage({ params }: { params: { slug: string } }) {
-  const instrument = instruments.find((item) => item.slug === params.slug);
+export default async function InstrumentDetailPage({
+  params
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const instrument = instruments.find((item) => item.slug === slug);
   if (!instrument) notFound();
 
   return (

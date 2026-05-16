@@ -3,23 +3,25 @@ import { prisma } from "@/lib/prisma";
 import { studentUpdateSchema } from "@/lib/validations";
 import { readJsonBody, routeErrorResponse } from "@/lib/route-errors";
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await prisma.student.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.student.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ message: "Kayıt bulunamadı." }, { status: 404 });
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const raw = await readJsonBody(request);
     if (!raw.ok) return raw.response;
     const parsed = studentUpdateSchema.parse(raw.body);
 
     const student = await prisma.student.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { userId: true }
     });
     if (!student) {
@@ -37,13 +39,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     if (Object.keys(data).length > 0) {
       await prisma.student.update({
-        where: { id: params.id },
+        where: { id },
         data
       });
     }
 
     const updated = await prisma.student.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { user: true }
     });
     return NextResponse.json(updated);

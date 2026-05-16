@@ -21,13 +21,14 @@ export const dynamic = "force-dynamic";
  * - Hata gövdelerinde KVKK için ayrıntı sızmaz.
  */
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession();
   if (!session || session.role !== "ADMIN") {
     return NextResponse.json({ message: "Bu işlem için yetkiniz yok." }, { status: 403 });
   }
 
-  const teacherId = params.id?.trim();
+  const { id } = await params;
+  const teacherId = id?.trim();
   if (!teacherId) {
     return NextResponse.json({ message: "Geçersiz istek." }, { status: 400 });
   }
