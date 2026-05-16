@@ -19,6 +19,9 @@ import {
 } from "@/app/admin/lesson-schedules/actions";
 import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
 import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
+import { bootstrapProductionDatabaseIfNeeded } from "@/lib/bootstrap-production-db";
+import { resolveDatabaseUrl } from "@/lib/database-url";
+import AdminDbSyncBanner from "@/components/admin/AdminDbSyncBanner";
 
 type StudentWithUser = Prisma.StudentGetPayload<{ include: { user: true; primaryTeacher: { include: { user: true } } } }>;
 type TeacherWithUser = Prisma.TeacherGetPayload<{ include: { user: true } }>;
@@ -61,6 +64,8 @@ export default async function AdminPage() {
   const session = await getServerSession();
   if (!session) redirect("/admin/login");
   if (session.role !== "ADMIN") redirect("/dashboard");
+
+  await bootstrapProductionDatabaseIfNeeded();
 
   let students: StudentWithUser[];
   let teachers: TeacherWithUser[];
@@ -141,9 +146,7 @@ export default async function AdminPage() {
         </p>
       </div>
       {loadError ? (
-        <div className="rounded-xl border border-red-900/80 bg-red-950/40 px-4 py-3 text-sm text-red-200">
-          {loadError}
-        </div>
+        <AdminDbSyncBanner message={loadError} showSyncButton={Boolean(resolveDatabaseUrl())} />
       ) : null}
 
       <AdminSubNav current="overview" />

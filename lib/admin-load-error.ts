@@ -3,18 +3,20 @@ import { resolveDatabaseUrl } from "@/lib/database-url";
 export function getAdminLoadErrorMessage(): string {
   if (process.env.VERCEL && !resolveDatabaseUrl()) {
     return (
-      "Canlı site veritabanı bağlı değil. Vercel → Proje → Settings → Environment Variables: " +
-      "DATABASE_URL=file:./dev.db varsa SİLİN. Integrations → Neon kurulu olmalı ve projeye bağlı olmalı → Redeploy. " +
-      "Yerel öğrenciler deploy ile veya VERITABANI-AKTAR.cmd ile aktarılır."
+      "Canlı sitede veritabanı bağlı değil (Neon Postgres gerekir, Turso değil). " +
+      "Vercel → Integrations → Neon kurun ve projeye bağlayın. " +
+      "Settings → Environment Variables: DATABASE_URL=file:./dev.db varsa silin → Redeploy. " +
+      "Sonra /admin sayfasını yenileyin; öğrenciler otomatik yüklenir."
     );
   }
   if (!resolveDatabaseUrl()) {
     return (
-      "Veritabanı adresi eksik. Vercel Neon → DATABASE_URL veya POSTGRES_PRISMA_URL → .env dosyasına yazın, " +
-      "VERITABANI-AKTAR.cmd çalıştırın."
+      "Veritabanı adresi eksik. Vercel Neon → DATABASE_URL → .env dosyasına yazın, " +
+      "VERITABANI-AKTAR.cmd çalıştırın veya okul bilgisayarında BASLA.cmd (localhost/admin)."
     );
   }
   return (
-    "Veritabanına bağlanılamadı veya tablolar eksik. Vercel’de Redeploy yapın; yerelde VERITABANI-AKTAR.cmd."
+    "Veritabanına bağlanılamadı veya tablolar eksik. Vercel’de Neon + Redeploy yapın; " +
+    "admin panelinde «Verileri yükle» düğmesini deneyin."
   );
 }
