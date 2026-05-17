@@ -9,6 +9,7 @@ type Tab =
   | "attendance"
   | "absences"
   | "accounting"
+  | "teacher-payments"
   | "instrument-sales"
   | "register-student"
   | "register-teacher";
@@ -71,6 +72,12 @@ export default function AdminSubNav({ current }: { current: Tab }) {
         </Link>
         <Link href="/admin/accounting" className={tabClass(current === "accounting")}>
           Muhasebe
+        </Link>
+        <Link
+          href="/admin/teacher-payments"
+          className={tabClass(current === "teacher-payments")}
+        >
+          Öğretmen ödemeleri
         </Link>
         <Link
           href="/admin/instrument-sales"

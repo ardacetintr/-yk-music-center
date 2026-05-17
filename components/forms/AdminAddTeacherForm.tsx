@@ -4,6 +4,7 @@ import { useFormState } from "react-dom";
 import { useState } from "react";
 import type { AdminFormActionState } from "@/lib/admin-form-action-state";
 import { TEACHER_BRANCH_OPTIONS } from "@/lib/teacher-instruments";
+import TeacherPaymentSettingsFields from "@/components/admin/TeacherPaymentSettingsFields";
 
 type Props = {
   action: (
@@ -91,6 +92,8 @@ export default function AdminAddTeacherForm({ action }: Props) {
           <input type="date" name="insuranceStartDate" className="rounded-lg border border-zinc-700 bg-black px-3 py-2 text-sm text-zinc-100" />
         </label>
       </div>
+
+      <TeacherPaymentSettingsFields />
 
       <div className="mt-auto flex w-full justify-center pt-4 pb-1">
         <button type="submit" className="min-w-[10rem] rounded-lg bg-brand-600 px-8 py-2.5 font-medium">

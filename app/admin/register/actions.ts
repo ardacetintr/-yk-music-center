@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { normalizePhone, phoneToEmail } from "@/lib/phone";
 import { isAllowedStudentCourse } from "@/lib/student-course-options";
 import { parseTeacherProfileFromForm } from "@/lib/teacher-profile-fields";
+import { parseTeacherPaymentFromForm, teacherPaymentPrismaData } from "@/lib/teacher-payment";
 import { attachTeacherRowToAdminUser } from "@/lib/link-teacher-to-admin-user";
 import { randomUUID } from "node:crypto";
 
@@ -98,8 +99,10 @@ export async function addTeacher(
   if (existing) {
     if (existing.role === UserRole.ADMIN) {
       let profile;
+      let payment;
       try {
         profile = parseTeacherProfileFromForm(formData);
+        payment = parseTeacherPaymentFromForm(formData);
       } catch (e) {
         return {
           ok: false,
@@ -111,6 +114,7 @@ export async function addTeacher(
         name,
         phone,
         profile,
+        payment,
       });
       if (!attached.ok) {
         return {
@@ -134,7 +138,17 @@ export async function addTeacher(
     };
   }
 
-  const profile = parseTeacherProfileFromForm(formData);
+  let profile;
+  let payment;
+  try {
+    profile = parseTeacherProfileFromForm(formData);
+    payment = parseTeacherPaymentFromForm(formData);
+  } catch (e) {
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Form doğrulanamadı.",
+    };
+  }
 
   try {
     const passwordHash = await hashPlaceholderUserPassword();
@@ -154,6 +168,7 @@ export async function addTeacher(
         employmentStartDate: profile.employmentStartDate,
         insuranceStartDate: profile.insuranceStartDate,
         approved: true,
+        ...teacherPaymentPrismaData(payment),
       },
     });
     revalidateAdminRegisterPaths();

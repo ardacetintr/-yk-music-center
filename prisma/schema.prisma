@@ -137,6 +137,18 @@ model Teacher {
 
   approved Boolean @default(true)
 
+  /// WEEKLY | MONTHLY
+  paymentPeriod String @default("MONTHLY")
+
+  /// Ders başı öğretmen ücreti (TL)
+  ratePerLesson Decimal? @db.Decimal(12, 2)
+
+  /// Aylık ödemede tahsil günü (1–31)
+  paymentDueDayOfMonth Int?
+
+  /// Haftalık ödemede gün (1 = Pazartesi … 7 = Pazar)
+  paymentDueDayOfWeek Int?
+
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

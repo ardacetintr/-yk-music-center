@@ -8,9 +8,11 @@ import { greetingDisplayName } from "@/lib/display-name";
 import { isAllowedStudentCourse } from "@/lib/student-course-options";
 import { TEACHER_BRANCH_OPTIONS, deserializeTeacherInstruments } from "@/lib/teacher-instruments";
 import { parseTeacherProfileFromForm } from "@/lib/teacher-profile-fields";
+import { parseTeacherPaymentFromForm, teacherPaymentPrismaData } from "@/lib/teacher-payment";
 import AdminRevealList from "@/components/admin/AdminRevealList";
 import AdminStudentListSection from "@/components/admin/AdminStudentListSection";
 import AdminSubNav from "@/components/admin/AdminSubNav";
+import TeacherPaymentSettingsFields from "@/components/admin/TeacherPaymentSettingsFields";
 import { isoDateInputValue } from "@/lib/date-input-value";
 import {
   addLessonSlotInline,
@@ -30,6 +32,7 @@ async function updateTeacher(formData: FormData) {
   "use server";
   const id = String(formData.get("id") ?? "");
   const profile = parseTeacherProfileFromForm(formData);
+  const payment = parseTeacherPaymentFromForm(formData);
   await prisma.teacher.update({
     where: { id },
     data: {
@@ -40,10 +43,12 @@ async function updateTeacher(formData: FormData) {
       birthDate: profile.birthDate,
       birthPlace: profile.birthPlace,
       employmentStartDate: profile.employmentStartDate,
-      insuranceStartDate: profile.insuranceStartDate
+      insuranceStartDate: profile.insuranceStartDate,
+      ...teacherPaymentPrismaData(payment)
     }
   });
   revalidatePath("/admin");
+  revalidatePath("/admin/teacher-payments");
 }
 
 async function deleteStudent(formData: FormData) {
@@ -288,6 +293,8 @@ export default async function AdminPage() {
                       />
                     </label>
                   </div>
+
+                  <TeacherPaymentSettingsFields teacher={teacher} />
 
                   <div className="flex flex-wrap items-center gap-2">
                     <button type="submit" className="rounded-lg bg-brand-700 px-3 py-1.5">

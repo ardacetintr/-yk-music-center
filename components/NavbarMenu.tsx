@@ -111,6 +111,13 @@ export default function NavbarMenu({ isLoggedIn, isAdmin }: Props) {
                   Devamsızlık
                 </Link>
                 <Link
+                  href="/admin/teacher-payments"
+                  onClick={closeMenu}
+                  className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-zinc-100"
+                >
+                  Öğretmen ödemeleri
+                </Link>
+                <Link
                   href="/admin/instrument-sales"
                   onClick={closeMenu}
                   className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-zinc-100"
