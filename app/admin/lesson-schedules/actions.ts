@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/phone";
-import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
 import { toWhatsAppInternationalPhone, type WhatsAppSendPayload } from "@/lib/whatsapp-url";
 import { weekdayLabelTr } from "@/lib/weekdays-tr";
 import { LESSON_SCOPE_INDIVIDUAL } from "@/lib/lesson-schedule-scope";
@@ -217,15 +216,7 @@ export async function prepareLessonReminderWhatsApp(
           `• Öğrenci: ${studentName}`,
           `• Gün: ${dayLabel}`,
           `• Saat: ${hour}`,
-          ...(normalizePhone(slot.student.parentPhone ?? "").length >= 10
-            ? [
-                `• Veli telefonu: ${formatTurkeyMobileDisplay(
-                  normalizePhone(slot.student.parentPhone ?? "")
-                )}`
-              ]
-            : []),
-          ...(slot.label ? [`• Ders: ${slot.label}`] : []),
-          ...(slot.notes ? [`• Not: ${slot.notes}`] : [])
+          ...(slot.label ? [`• Ders: ${slot.label}`] : [])
         ].join("\n");
 
   return {
