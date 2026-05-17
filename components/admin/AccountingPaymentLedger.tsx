@@ -7,6 +7,7 @@ import {
   upsertStudentMonthlyPayment
 } from "@/app/admin/accounting/ledger/actions";
 import { formatTurkishMoney } from "@/lib/money";
+import { useAdminToastOptional } from "@/components/admin/AdminToastProvider";
 
 export type PaymentLedgerRow = {
   id: string;
@@ -40,6 +41,7 @@ export default function AccountingPaymentLedger({
   const [pending, setPending] = useState(false);
   const [studentId, setStudentId] = useState("");
   const [amount, setAmount] = useState("");
+  const toast = useAdminToastOptional();
 
   const monthValue = filterMonth ?? defaultMonth;
 
@@ -73,8 +75,13 @@ export default function AccountingPaymentLedger({
     setError("");
     try {
       await upsertStudentMonthlyPayment(formData);
+      toast?.showToast("payment-saved");
+      setStudentId("");
+      setAmount("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Kaydedilemedi.");
+      const msg = e instanceof Error ? e.message : "Kaydedilemedi.";
+      setError(msg);
+      toast?.showToast(msg, "error");
     } finally {
       setPending(false);
     }
@@ -88,8 +95,11 @@ export default function AccountingPaymentLedger({
       const fd = new FormData();
       fd.set("id", id);
       await deleteStudentMonthlyPayment(fd);
+      toast?.showToast("payment-deleted");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Silinemedi.");
+      const msg = e instanceof Error ? e.message : "Silinemedi.";
+      setError(msg);
+      toast?.showToast(msg, "error");
     } finally {
       setPending(false);
     }

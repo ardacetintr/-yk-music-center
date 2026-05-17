@@ -1,12 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { getServerSession } from "@/lib/auth";
+import { redirectWithAdminToast } from "@/lib/admin-toast-redirect";
 import { parseTurkishMoneyInput } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
 
-const PAGE_PATH = "/admin/instrument-sales";
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 async function ensureAdmin() {
@@ -14,10 +13,6 @@ async function ensureAdmin() {
   if (!session || session.role !== "ADMIN") {
     throw new Error("Yetkisiz işlem.");
   }
-}
-
-function revalidateSales() {
-  revalidatePath(PAGE_PATH);
 }
 
 export async function addInstrumentSale(formData: FormData) {
@@ -46,7 +41,7 @@ export async function addInstrumentSale(formData: FormData) {
     }
   });
 
-  revalidateSales();
+  redirectWithAdminToast("/admin/instrument-sales", "instrument-sale-added");
 }
 
 export async function deleteInstrumentSale(formData: FormData) {
@@ -56,5 +51,5 @@ export async function deleteInstrumentSale(formData: FormData) {
   if (!id) throw new Error("Kayıt bulunamadı.");
 
   await prisma.instrumentSale.delete({ where: { id } });
-  revalidateSales();
+  redirectWithAdminToast("/admin/instrument-sales", "instrument-sale-deleted");
 }

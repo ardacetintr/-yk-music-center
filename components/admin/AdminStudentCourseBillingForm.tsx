@@ -21,22 +21,11 @@ export default function AdminStudentCourseBillingForm({
   const [fee, setFee] = useState(
     courseFee != null && courseFee > 0 ? String(courseFee).replace(".", ",") : ""
   );
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSaving(true);
-    setMessage("");
-    try {
-      const fd = new FormData(e.currentTarget);
-      await updateAction(fd);
-      setMessage("Kaydedildi.");
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Kaydedilemedi.");
-    } finally {
-      setSaving(false);
-    }
+    const fd = new FormData(e.currentTarget);
+    await updateAction(fd);
   }
 
   return (
@@ -72,16 +61,10 @@ export default function AdminStudentCourseBillingForm({
       <div className="flex items-center gap-2">
         <button
           type="submit"
-          disabled={saving}
-          className="rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-medium disabled:opacity-50"
+          className="rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-medium"
         >
-          {saving ? "…" : "Kaydet"}
+          Kaydet
         </button>
-        {message ? (
-          <span className={`text-xs ${message === "Kaydedildi." ? "text-emerald-400" : "text-red-400"}`}>
-            {message}
-          </span>
-        ) : null}
       </div>
     </form>
   );

@@ -1,10 +1,11 @@
 "use client";
 
 import { useFormState } from "react-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AdminFormActionState } from "@/lib/admin-form-action-state";
 import { TEACHER_BRANCH_OPTIONS } from "@/lib/teacher-instruments";
 import TeacherPaymentSettingsFields from "@/components/admin/TeacherPaymentSettingsFields";
+import { useAdminToastOptional } from "@/components/admin/AdminToastProvider";
 
 type Props = {
   action: (
@@ -16,15 +17,20 @@ type Props = {
 export default function AdminAddTeacherForm({ action }: Props) {
   const [state, formAction] = useFormState(action, null);
   const [name, setName] = useState("");
+  const toast = useAdminToastOptional();
+
+  useEffect(() => {
+    if (state?.ok) {
+      setName("");
+      toast?.showToast("teacher-created");
+    } else if (state?.ok === false) {
+      toast?.showToast(state.message, "error");
+    }
+  }, [state, toast]);
 
   return (
     <form action={formAction} className="card flex min-h-0 w-full flex-1 flex-col space-y-2">
       <h2 className="text-lg font-semibold">Öğretmen Kaydı</h2>
-      {state?.ok === false ? (
-        <p className="rounded-lg border border-red-900/60 bg-red-950/50 px-3 py-2 text-sm text-red-200">
-          {state.message}
-        </p>
-      ) : null}
       <input
         name="name"
         required

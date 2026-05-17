@@ -2,6 +2,7 @@
 
 import { useMemo, useTransition } from "react";
 import { setLessonSessionAttendance } from "@/app/admin/attendance/actions";
+import { useAdminToastOptional } from "@/components/admin/AdminToastProvider";
 import { getTeacherScheduleColors } from "@/lib/teacher-schedule-colors";
 
 export type AttendanceDayRow = {
@@ -234,11 +235,17 @@ function BulkColumn({
 
 export default function AttendanceDayList({ sessionDate, dateLabel, rows }: Props) {
   const [pending, startTransition] = useTransition();
+  const toast = useAdminToastOptional();
 
   function run(form: HTMLFormElement) {
     const fd = new FormData(form);
     startTransition(async () => {
-      await setLessonSessionAttendance(fd);
+      try {
+        await setLessonSessionAttendance(fd);
+        toast?.showToast("attendance-saved");
+      } catch (e) {
+        toast?.showToast(e instanceof Error ? e.message : "Kaydedilemedi.", "error");
+      }
     });
   }
 

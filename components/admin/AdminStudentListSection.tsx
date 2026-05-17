@@ -1,6 +1,8 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useState } from "react";
+import { useAdminOverviewAccordion } from "@/components/admin/AdminOverviewAccordion";
+import { studentPanelKey } from "@/lib/admin-panel-key";
 import AdminStudentLessonSlots, { type AdminLessonSlotRow } from "@/components/admin/AdminStudentLessonSlots";
 import AdminStudentCourseBillingForm from "@/components/admin/AdminStudentCourseBillingForm";
 import { formatTimeForTimeInput } from "@/lib/time-hhmm";
@@ -161,10 +163,10 @@ export default function AdminStudentListSection({
   updateLessonSlotInline,
   deleteLessonSlotInline
 }: Props) {
+  const { openKey, toggleKey, closePanel, isOpen: isPanelOpen } = useAdminOverviewAccordion();
   const [query, setQuery] = useState("");
   const [course, setCourse] = useState("");
   const [teacherFilter, setTeacherFilter] = useState("");
-  const [openEditStudentId, setOpenEditStudentId] = useState<string | null>(null);
   const [summaryShowAll, setSummaryShowAll] = useState(false);
 
   const slotsByStudentId = useMemo(() => {
@@ -191,10 +193,10 @@ export default function AdminStudentListSection({
   }, [students, query, course, teacherFilter]);
 
   useEffect(() => {
-    if (openEditStudentId && !filtered.some((s) => s.id === openEditStudentId)) {
-      setOpenEditStudentId(null);
+    if (openKey?.startsWith("student:") && !filtered.some((s) => studentPanelKey(s.id) === openKey)) {
+      closePanel();
     }
-  }, [filtered, openEditStudentId]);
+  }, [filtered, openKey, closePanel]);
 
   useEffect(() => {
     setSummaryShowAll(false);
@@ -206,13 +208,13 @@ export default function AdminStudentListSection({
   }, [filtered, summaryShowAll]);
 
   useEffect(() => {
-    if (!summaryShowAll && openEditStudentId) {
+    if (!summaryShowAll && openKey?.startsWith("student:")) {
       const head = filtered.slice(0, SUMMARY_TABLE_INITIAL);
-      if (!head.some((s) => s.id === openEditStudentId)) {
-        setOpenEditStudentId(null);
+      if (!head.some((s) => studentPanelKey(s.id) === openKey)) {
+        closePanel();
       }
     }
-  }, [summaryShowAll, filtered, openEditStudentId]);
+  }, [summaryShowAll, filtered, openKey, closePanel]);
 
   if (students.length === 0) {
     return <p className="text-sm text-zinc-500">Henüz kayıtlı öğrenci yok.</p>;
@@ -291,7 +293,8 @@ export default function AdminStudentListSection({
                         firstSlot.endTime ? `–${formatTimeForTimeInput(firstSlot.endTime)}` : ""
                       }${studentSlots.length > 1 ? ` (+${studentSlots.length - 1} ders)` : ""}`
                     : null;
-                  const isOpen = openEditStudentId === s.id;
+                  const panelKey = studentPanelKey(s.id);
+                  const isOpen = isPanelOpen(panelKey);
                   return (
                     <Fragment key={s.id}>
                       <tr
@@ -324,9 +327,7 @@ export default function AdminStudentListSection({
                             aria-controls={`student-edit-${s.id}`}
                             id={`student-edit-trigger-${s.id}`}
                             title={isOpen ? "Düzenlemeyi kapat" : "Kaydı düzenle"}
-                            onClick={() =>
-                              setOpenEditStudentId((prev) => (prev === s.id ? null : s.id))
-                            }
+                            onClick={() => toggleKey(panelKey)}
                             className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border transition ${
                               isOpen
                                 ? "border-brand-500/70 bg-brand-950/40 text-brand-200"

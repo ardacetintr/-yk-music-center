@@ -1,9 +1,9 @@
 "use server";
 
 import { getServerSession } from "@/lib/auth";
+import { redirectWithAdminToast } from "@/lib/admin-toast-redirect";
 import {
   clearLessonAttendanceFromStudentAbsence,
-  revalidateAttendanceAndAbsences,
   syncLessonAttendanceFromStudentAbsence
 } from "@/lib/attendance-absence-sync";
 import { prisma } from "@/lib/prisma";
@@ -36,7 +36,7 @@ export async function addStudentAbsence(formData: FormData) {
   }
 
   await syncLessonAttendanceFromStudentAbsence(studentId, absenceDate);
-  revalidateAttendanceAndAbsences(absenceDate);
+  redirectWithAdminToast("/admin/absences", "absence-added");
 }
 
 export async function deleteStudentAbsence(formData: FormData) {
@@ -52,5 +52,5 @@ export async function deleteStudentAbsence(formData: FormData) {
 
   await prisma.studentAbsence.delete({ where: { id } });
   await clearLessonAttendanceFromStudentAbsence(row.studentId, row.absenceDate);
-  revalidateAttendanceAndAbsences(row.absenceDate);
+  redirectWithAdminToast("/admin/absences", "absence-deleted");
 }

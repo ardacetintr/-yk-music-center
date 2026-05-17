@@ -4,6 +4,7 @@ import { useFormState } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import type { AdminFormActionState } from "@/lib/admin-form-action-state";
 import { STUDENT_COURSE_OPTIONS } from "@/lib/student-course-options";
+import { useAdminToastOptional } from "@/components/admin/AdminToastProvider";
 
 type Props = {
   action: (
@@ -17,13 +18,17 @@ export default function AdminAddStudentForm({ action, teachers }: Props) {
   const [state, formAction] = useFormState(action, null);
   const [name, setName] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
+  const toast = useAdminToastOptional();
 
   useEffect(() => {
     if (state?.ok) {
       formRef.current?.reset();
       setName("");
+      toast?.showToast("student-created");
+    } else if (state?.ok === false) {
+      toast?.showToast(state.message, "error");
     }
-  }, [state]);
+  }, [state, toast]);
 
   return (
     <form
@@ -32,16 +37,6 @@ export default function AdminAddStudentForm({ action, teachers }: Props) {
       className="card flex min-h-0 w-full flex-1 flex-col space-y-2"
     >
       <h2 className="text-lg font-semibold">Öğrenci Kaydı</h2>
-      {state?.ok === true ? (
-        <p className="rounded-lg border border-emerald-900/60 bg-emerald-950/50 px-3 py-2 text-sm text-emerald-200">
-          Kayıt oluşturuldu.
-        </p>
-      ) : null}
-      {state?.ok === false ? (
-        <p className="rounded-lg border border-red-900/60 bg-red-950/50 px-3 py-2 text-sm text-red-200">
-          {state.message}
-        </p>
-      ) : null}
       <input
         name="name"
         required

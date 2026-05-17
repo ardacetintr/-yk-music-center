@@ -12,14 +12,9 @@ import PlannedLessonSlotsReveal from "@/components/admin/PlannedLessonSlotsRevea
 import LessonScheduleProgramViews from "@/components/admin/LessonScheduleProgramViews";
 import LessonSlotDersSelect from "@/components/forms/LessonSlotDersSelect";
 import LessonSlotEditForm from "@/components/forms/LessonSlotEditForm";
-import LessonScheduleFlashToast from "@/components/admin/LessonScheduleFlashToast";
 import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
+import { adminToastFromSearchParams } from "@/lib/admin-toast";
 import { getTeacherScheduleColors } from "@/lib/teacher-schedule-colors";
-
-function toastFromSearchParams(searchParams?: Record<string, string | string[] | undefined>) {
-  const raw = searchParams?.toast;
-  return typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : undefined;
-}
 
 type SlotWithRelations = Prisma.StudentLessonSlotGetPayload<{
   include: {
@@ -73,11 +68,10 @@ export default async function AdminLessonSchedulesPage({
 
   const studentOptions = students.map((st) => ({ id: st.id, name: st.user.name }));
   const teacherOptions = teachers.map((th) => ({ id: th.id, name: th.user.name }));
-  const toastKey = toastFromSearchParams(resolvedSearchParams);
+  void adminToastFromSearchParams(resolvedSearchParams);
 
   return (
     <div className="space-y-6">
-      <LessonScheduleFlashToast toastKey={toastKey} />
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs text-zinc-500">

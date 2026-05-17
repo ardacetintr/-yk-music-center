@@ -81,6 +81,17 @@ body.theme-night {
   }
 }
 
+@keyframes adminToastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .container {
   @apply mx-auto max-w-6xl px-4;
 }
