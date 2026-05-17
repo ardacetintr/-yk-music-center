@@ -10,9 +10,8 @@ import {
 } from "@/lib/payment-whatsapp";
 import type { WhatsAppSendPayload } from "@/lib/whatsapp-url";
 import {
-  clampPaymentDueDay,
   getCurrentPaymentMonth,
-  isPaidForCurrentMonth,
+  isPaidFromLedgerSet,
   isPaymentDueReached
 } from "@/lib/payment-month";
 
@@ -27,32 +26,6 @@ async function ensureAdmin() {
 
 function revalidateAccounting() {
   revalidatePath(ACCOUNTING_PATH);
-}
-
-export async function updateStudentPaymentDueDay(formData: FormData) {
-  await ensureAdmin();
-  const studentId = String(formData.get("studentId") ?? "").trim();
-  const dueDay = clampPaymentDueDay(Number(formData.get("paymentDueDay") ?? 1));
-  if (!studentId) throw new Error("Öğrenci bulunamadı.");
-
-  await prisma.student.update({
-    where: { id: studentId },
-    data: { paymentDueDay: dueDay }
-  });
-  revalidateAccounting();
-}
-
-export async function setStudentPaymentPaid(formData: FormData) {
-  await ensureAdmin();
-  const studentId = String(formData.get("studentId") ?? "").trim();
-  const paid = String(formData.get("paid") ?? "") === "1";
-  if (!studentId) throw new Error("Öğrenci bulunamadı.");
-
-  await prisma.student.update({
-    where: { id: studentId },
-    data: { paymentPaidMonth: paid ? getCurrentPaymentMonth() : null }
-  });
-  revalidateAccounting();
 }
 
 export type PreparePaymentReminderWhatsAppResult =
@@ -107,10 +80,18 @@ export type PrepareDueTodayBulkResult =
 export async function prepareDueTodayBulkPaymentReminders(): Promise<PrepareDueTodayBulkResult> {
   await ensureAdmin();
 
-  const students = await prisma.student.findMany({
-    include: { user: true },
-    orderBy: { user: { name: "asc" } }
-  });
+  const currentMonth = getCurrentPaymentMonth();
+  const [students, monthPayments] = await Promise.all([
+    prisma.student.findMany({
+      include: { user: true },
+      orderBy: { user: { name: "asc" } }
+    }),
+    prisma.studentMonthlyPayment.findMany({
+      where: { paymentMonth: currentMonth },
+      select: { studentId: true }
+    })
+  ]);
+  const paidStudentIds = new Set(monthPayments.map((p) => p.studentId));
 
   const targets: PaymentReminderTarget[] = [];
   const skipped: { studentName: string; reason: string }[] = [];
@@ -118,7 +99,7 @@ export async function prepareDueTodayBulkPaymentReminders(): Promise<PrepareDueT
   for (const s of students) {
     const dueDay = s.paymentDueDay ?? 1;
     const due = isPaymentDueReached(dueDay);
-    const paid = isPaidForCurrentMonth(s.paymentPaidMonth);
+    const paid = isPaidFromLedgerSet(paidStudentIds, s.id);
     const name = s.user.name;
 
     if (!due || paid) continue;

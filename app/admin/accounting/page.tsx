@@ -6,9 +6,10 @@ import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 import { bootstrapProductionDatabaseIfNeeded } from "@/lib/bootstrap-production-db";
 import {
   getCurrentPaymentMonth,
-  isPaidForCurrentMonth,
+  isPaidFromLedgerSet,
   isPaymentDueReached
 } from "@/lib/payment-month";
+import { courseFeeToNumber } from "@/lib/student-course-billing";
 import { formatTurkeyMobileDisplay } from "@/lib/student-login-whatsapp";
 import {
   buildPaymentReminderWhatsAppPayload,
@@ -35,16 +36,24 @@ export default async function AdminAccountingPage() {
   let rows: AccountingStudentRow[] = [];
 
   try {
-    const students = await prisma.student.findMany({
-      include: { user: true },
-      orderBy: { user: { name: "asc" } }
-    });
+    const [students, monthPayments] = await Promise.all([
+      prisma.student.findMany({
+        include: { user: true },
+        orderBy: { user: { name: "asc" } }
+      }),
+      prisma.studentMonthlyPayment.findMany({
+        where: { paymentMonth: currentMonth },
+        select: { studentId: true }
+      })
+    ]);
+
+    const paidStudentIds = new Set(monthPayments.map((p) => p.studentId));
 
     rows = students.map((s) => {
       const recipientPhone = resolvePaymentRecipientPhone(s.parentPhone);
       const parentPhoneNorm = recipientPhone ?? "";
       const hasParentPhone = Boolean(recipientPhone);
-      const isPaid = isPaidForCurrentMonth(s.paymentPaidMonth);
+      const isPaid = isPaidFromLedgerSet(paidStudentIds, s.id);
       const dueDay = s.paymentDueDay ?? 1;
       const studentName = s.user.name;
 
@@ -64,6 +73,8 @@ export default async function AdminAccountingPage() {
             })
           : null,
         paymentDueDay: dueDay,
+        courseFee: courseFeeToNumber(s.courseFee),
+        courseStartDate: s.courseStartDate,
         isPaid,
         isDueReached: isPaymentDueReached(dueDay)
       };
@@ -105,8 +116,9 @@ export default async function AdminAccountingPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold">Öğrenci ödemeleri — {currentMonthLabel}</h2>
           <p className="text-xs text-zinc-500">
-            <span className="text-emerald-400">Ödendi</span> /{" "}
-            <span className="text-red-400">Ödenmedi</span> — duruma tıklayarak değiştirin
+            Ödendi durumu yalnızca{" "}
+            <span className="text-zinc-300">Ödeme kayıtları</span> sekmesinden eklenen kayıtlara göre
+            güncellenir.
           </p>
         </div>
         <AccountingStudentsSection

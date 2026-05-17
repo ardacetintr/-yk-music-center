@@ -11,12 +11,17 @@ import { isAllowedStudentCourse } from "@/lib/student-course-options";
 import { parseTeacherProfileFromForm } from "@/lib/teacher-profile-fields";
 import { parseTeacherPaymentFromForm, teacherPaymentPrismaData } from "@/lib/teacher-payment";
 import { attachTeacherRowToAdminUser } from "@/lib/link-teacher-to-admin-user";
+import {
+  parseStudentCourseBillingFromForm,
+  studentCourseBillingPrismaData
+} from "@/lib/student-course-billing";
 import { randomUUID } from "node:crypto";
 
 function revalidateAdminRegisterPaths() {
   revalidatePath("/admin");
   revalidatePath("/admin/register-student");
   revalidatePath("/admin/register-teacher");
+  revalidatePath("/admin/accounting");
 }
 
 export async function addStudent(
@@ -53,6 +58,16 @@ export async function addStudent(
 
   const email = `stud_${randomUUID().replace(/-/g, "")}@internal.local`;
 
+  let billing;
+  try {
+    billing = parseStudentCourseBillingFromForm(formData);
+  } catch (e) {
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Kurs ücreti / başlangıç bilgisi geçersiz."
+    };
+  }
+
   try {
     const passwordHash = await hashPlaceholderUserPassword();
     const user = await prisma.user.create({
@@ -65,6 +80,7 @@ export async function addStudent(
         parentName,
         parentPhone,
         primaryTeacherId,
+        ...studentCourseBillingPrismaData(billing)
       },
     });
     revalidateAdminRegisterPaths();

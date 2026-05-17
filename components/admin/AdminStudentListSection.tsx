@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useMemo, useState } from "react";
 import AdminStudentLessonSlots, { type AdminLessonSlotRow } from "@/components/admin/AdminStudentLessonSlots";
+import AdminStudentCourseBillingForm from "@/components/admin/AdminStudentCourseBillingForm";
 import { formatTimeForTimeInput } from "@/lib/time-hhmm";
 import { weekdayLabelTr } from "@/lib/weekdays-tr";
 import { STUDENT_COURSE_OPTIONS } from "@/lib/student-course-options";
@@ -16,6 +17,9 @@ export type AdminStudentListRow = {
   /** Form `defaultValue` için DB’deki ham değer */
   parentPhone: string | null;
   parentPhoneDisplay: string;
+  courseFee: number | null;
+  courseStartDate: string | null;
+  paymentDueDay: number;
 };
 
 type TeacherOption = { id: string; name: string };
@@ -28,6 +32,7 @@ type Props = {
   students: AdminStudentListRow[];
   teachers: TeacherOption[];
   lessonSlots: AdminLessonSlotRow[];
+  updateStudentCourseBilling: FormAction;
   deleteStudent: FormAction;
   addLessonSlotInline: FormAction;
   updateLessonSlotInline: FormAction;
@@ -57,6 +62,7 @@ type StudentEditPanelProps = {
   student: AdminStudentListRow;
   teachers: TeacherOption[];
   studentSlots: AdminLessonSlotRow[];
+  updateStudentCourseBilling: FormAction;
   deleteStudent: FormAction;
   addLessonSlotInline: FormAction;
   updateLessonSlotInline: FormAction;
@@ -67,6 +73,7 @@ function StudentEditPanel({
   student,
   teachers,
   studentSlots,
+  updateStudentCourseBilling,
   deleteStudent,
   addLessonSlotInline,
   updateLessonSlotInline,
@@ -74,6 +81,13 @@ function StudentEditPanel({
 }: StudentEditPanelProps) {
   return (
     <div className="space-y-6 border-l-2 border-brand-500/60 py-1 pl-4 sm:pl-5">
+      <AdminStudentCourseBillingForm
+        studentId={student.id}
+        courseFee={student.courseFee}
+        courseStartDate={student.courseStartDate}
+        paymentDueDay={student.paymentDueDay}
+        updateAction={updateStudentCourseBilling}
+      />
       <AdminStudentLessonSlots
         layout="panelLead"
         studentId={student.id}
@@ -141,6 +155,7 @@ export default function AdminStudentListSection({
   students,
   teachers,
   lessonSlots,
+  updateStudentCourseBilling,
   deleteStudent,
   addLessonSlotInline,
   updateLessonSlotInline,
@@ -337,6 +352,7 @@ export default function AdminStudentListSection({
                                 student={s}
                                 teachers={teachers}
                                 studentSlots={studentSlots}
+                                updateStudentCourseBilling={updateStudentCourseBilling}
                                 deleteStudent={deleteStudent}
                                 addLessonSlotInline={addLessonSlotInline}
                                 updateLessonSlotInline={updateLessonSlotInline}

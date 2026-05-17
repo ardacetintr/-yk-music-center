@@ -13,9 +13,21 @@ export function getTodayDayOfMonth(date = new Date()): number {
   return Number.isFinite(d) ? d : 1;
 }
 
-export function isPaidForCurrentMonth(paymentPaidMonth: string | null | undefined): boolean {
+export function isPaidForMonth(
+  paymentPaidMonth: string | null | undefined,
+  month: string = getCurrentPaymentMonth()
+): boolean {
   if (!paymentPaidMonth?.trim()) return false;
-  return paymentPaidMonth.trim() === getCurrentPaymentMonth();
+  return paymentPaidMonth.trim() === month;
+}
+
+export function isPaidForCurrentMonth(paymentPaidMonth: string | null | undefined): boolean {
+  return isPaidForMonth(paymentPaidMonth);
+}
+
+/** Ödeme defterinde bu ay için kayıt var mı */
+export function isPaidFromLedgerSet(paidStudentIds: ReadonlySet<string>, studentId: string): boolean {
+  return paidStudentIds.has(studentId);
 }
 
 /** Bu ay tahsilat günü gelmiş mi (bugün >= dueDay) */

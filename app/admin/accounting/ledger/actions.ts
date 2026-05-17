@@ -64,6 +64,14 @@ export async function upsertStudentMonthlyPayment(formData: FormData) {
     });
   }
 
+  const currentMonth = getCurrentPaymentMonth();
+  if (paymentMonth === currentMonth) {
+    await prisma.student.update({
+      where: { id: studentId },
+      data: { paymentPaidMonth: paymentMonth }
+    });
+  }
+
   revalidateLedger();
 }
 
@@ -71,6 +79,25 @@ export async function deleteStudentMonthlyPayment(formData: FormData) {
   await ensureAdmin();
   const id = String(formData.get("id") ?? "").trim();
   if (!id) throw new Error("Kayıt bulunamadı.");
+
+  const row = await prisma.studentMonthlyPayment.findUnique({
+    where: { id },
+    select: { studentId: true, paymentMonth: true }
+  });
+  if (!row) throw new Error("Kayıt bulunamadı.");
+
   await prisma.studentMonthlyPayment.delete({ where: { id } });
+
+  const currentMonth = getCurrentPaymentMonth();
+  if (row.paymentMonth === currentMonth) {
+    const stillPaid = await prisma.studentMonthlyPayment.findFirst({
+      where: { studentId: row.studentId, paymentMonth: currentMonth }
+    });
+    await prisma.student.update({
+      where: { id: row.studentId },
+      data: { paymentPaidMonth: stillPaid ? currentMonth : null }
+    });
+  }
+
   revalidateLedger();
 }

@@ -9,6 +9,11 @@ import { isAllowedStudentCourse } from "@/lib/student-course-options";
 import { TEACHER_BRANCH_OPTIONS, deserializeTeacherInstruments } from "@/lib/teacher-instruments";
 import { parseTeacherProfileFromForm } from "@/lib/teacher-profile-fields";
 import { parseTeacherPaymentFromForm, teacherPaymentPrismaData } from "@/lib/teacher-payment";
+import {
+  courseFeeToNumber,
+  parseStudentCourseBillingFromForm,
+  studentCourseBillingPrismaData
+} from "@/lib/student-course-billing";
 import AdminRevealList from "@/components/admin/AdminRevealList";
 import AdminStudentListSection from "@/components/admin/AdminStudentListSection";
 import AdminSubNav from "@/components/admin/AdminSubNav";
@@ -49,6 +54,20 @@ async function updateTeacher(formData: FormData) {
   });
   revalidatePath("/admin");
   revalidatePath("/admin/teacher-payments");
+}
+
+async function updateStudentCourseBilling(formData: FormData) {
+  "use server";
+  const id = String(formData.get("studentId") ?? "").trim();
+  if (!id) throw new Error("Öğrenci bulunamadı.");
+  const billing = parseStudentCourseBillingFromForm(formData);
+  await prisma.student.update({
+    where: { id },
+    data: studentCourseBillingPrismaData(billing)
+  });
+  revalidatePath("/admin");
+  revalidatePath("/admin/accounting");
+  revalidatePath("/admin/accounting/ledger");
 }
 
 async function deleteStudent(formData: FormData) {
@@ -138,7 +157,10 @@ export default async function AdminPage() {
     primaryTeacherName: s.primaryTeacher?.user.name ?? null,
     parentName: s.parentName,
     parentPhone: s.parentPhone,
-    parentPhoneDisplay: s.parentPhone ? formatTurkeyMobileDisplay(normalizePhone(s.parentPhone)) : ""
+    parentPhoneDisplay: s.parentPhone ? formatTurkeyMobileDisplay(normalizePhone(s.parentPhone)) : "",
+    courseFee: courseFeeToNumber(s.courseFee),
+    courseStartDate: s.courseStartDate,
+    paymentDueDay: s.paymentDueDay ?? 1
   }));
 
   return (
@@ -162,6 +184,7 @@ export default async function AdminPage() {
           students={studentListRows}
           teachers={teacherSelectOptions}
           lessonSlots={lessonSlots}
+          updateStudentCourseBilling={updateStudentCourseBilling}
           deleteStudent={deleteStudent}
           addLessonSlotInline={addLessonSlotInline}
           updateLessonSlotInline={updateLessonSlotInline}

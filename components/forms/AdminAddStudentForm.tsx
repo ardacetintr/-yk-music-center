@@ -83,6 +83,31 @@ export default function AdminAddStudentForm({ action, teachers }: Props) {
           Öğretmen listesi boş görünüyor. Önce öğretmen ekleyin veya sayfayı yenileyin.
         </p>
       ) : null}
+      <fieldset className="space-y-2 rounded-lg border border-zinc-800 bg-zinc-950/40 px-3 py-2">
+        <legend className="px-1 text-xs text-zinc-500">Kurs ücreti ve başlangıç</legend>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <label className="flex flex-col gap-0.5 text-xs text-zinc-500">
+            Kurs ücreti (₺ / ay)
+            <input
+              name="courseFee"
+              inputMode="decimal"
+              placeholder="Örn. 3000"
+              className="w-full rounded-lg border border-zinc-700 bg-black px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="flex flex-col gap-0.5 text-xs text-zinc-500">
+            Kursa başlangıç tarihi
+            <input
+              type="date"
+              name="courseStartDate"
+              className="w-full rounded-lg border border-zinc-700 bg-black px-3 py-2 text-sm text-zinc-100"
+            />
+          </label>
+        </div>
+        <p className="text-[11px] text-zinc-600">
+          Tahsilat günü, başlangıç tarihinin ayın gününe göre belirlenir.
+        </p>
+      </fieldset>
       <div className="flex flex-col gap-2">
         <input
           name="parentName"

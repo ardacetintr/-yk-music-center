@@ -6,6 +6,7 @@ import AccountingPaymentLedger, {
 import { getAdminLoadErrorMessage } from "@/lib/admin-load-error";
 import { bootstrapProductionDatabaseIfNeeded } from "@/lib/bootstrap-production-db";
 import { getCurrentPaymentMonth } from "@/lib/payment-month";
+import { courseFeeToNumber } from "@/lib/student-course-billing";
 
 function formatMonthLabel(yyyyMm: string): string {
   const [y, m] = yyyyMm.split("-").map(Number);
@@ -28,7 +29,7 @@ async function LedgerContent({ searchParams }: { searchParams: SearchParams }) {
 
   let loadError: string | null = null;
   let rows: PaymentLedgerRow[] = [];
-  let students: { id: string; name: string }[] = [];
+  let students: { id: string; name: string; courseFee: number | null }[] = [];
 
   try {
     if (!("studentMonthlyPayment" in prisma) || !prisma.studentMonthlyPayment) {
@@ -49,7 +50,11 @@ async function LedgerContent({ searchParams }: { searchParams: SearchParams }) {
       })
     ]);
 
-    students = studentList.map((s) => ({ id: s.id, name: s.user.name }));
+    students = studentList.map((s) => ({
+      id: s.id,
+      name: s.user.name,
+      courseFee: courseFeeToNumber(s.courseFee)
+    }));
 
     rows = payments.map((p) => ({
       id: p.id,

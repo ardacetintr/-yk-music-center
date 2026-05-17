@@ -63,10 +63,16 @@ model Student {
 
   primaryTeacherId String?
 
-  /// Aylık ödeme tahsilat günü (1–31)
+  /// Aylık kurs ücreti (TL)
+  courseFee Decimal? @db.Decimal(12, 2)
+
+  /// Kursa başlangıç (YYYY-MM-DD)
+  courseStartDate String?
+
+  /// Aylık ödeme tahsilat günü (1–31); kurs başlangıç tarihinden türetilir
   paymentDueDay Int @default(1)
 
-  /// Son ödenen ay (YYYY-MM, Europe/Istanbul)
+  /// Son ödenen ay (YYYY-MM) — ödeme kaydı defteri ile senkron tutulur
   paymentPaidMonth String?
 
   createdAt DateTime @default(now())

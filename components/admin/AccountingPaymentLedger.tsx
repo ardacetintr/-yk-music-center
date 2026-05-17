@@ -19,7 +19,7 @@ export type PaymentLedgerRow = {
   notes: string | null;
 };
 
-export type StudentOption = { id: string; name: string };
+export type StudentOption = { id: string; name: string; courseFee: number | null };
 
 type Props = {
   rows: PaymentLedgerRow[];
@@ -38,8 +38,18 @@ export default function AccountingPaymentLedger({
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [studentId, setStudentId] = useState("");
+  const [amount, setAmount] = useState("");
 
   const monthValue = filterMonth ?? defaultMonth;
+
+  function onStudentChange(id: string) {
+    setStudentId(id);
+    const st = students.find((s) => s.id === id);
+    if (st?.courseFee != null && st.courseFee > 0) {
+      setAmount(String(st.courseFee).replace(".", ","));
+    }
+  }
 
   const filtered = useMemo(() => {
     if (!filterMonth) return rows;
@@ -107,6 +117,8 @@ export default function AccountingPaymentLedger({
             <select
               name="studentId"
               required
+              value={studentId}
+              onChange={(e) => onStudentChange(e.target.value)}
               className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
             >
               <option value="">Seçin</option>
@@ -132,6 +144,8 @@ export default function AccountingPaymentLedger({
             <input
               name="amount"
               required
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
               placeholder="1500"
               className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
             />
