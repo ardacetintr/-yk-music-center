@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { teacherPaymentPrismaData, type TeacherPaymentSettings } from "@/lib/teacher-payment";
+import {
+  defaultTeacherPaymentSettings,
+  teacherPaymentPrismaData,
+  type TeacherPaymentSettings
+} from "@/lib/teacher-payment";
 
 /** `Teacher` tablosu için ortak alanlar (JSON enstrüman listesi dahil). */
 export type TeacherRowProfileInput = {
@@ -22,7 +26,7 @@ export async function attachTeacherRowToAdminUser(params: {
   name: string;
   phone: string;
   profile: TeacherRowProfileInput;
-  payment: TeacherPaymentSettings;
+  payment?: TeacherPaymentSettings;
 }): Promise<{ ok: true } | { ok: false; reason: "already_teacher" }> {
   const existingTeacher = await prisma.teacher.findUnique({
     where: { userId: params.userId }
@@ -50,7 +54,7 @@ export async function attachTeacherRowToAdminUser(params: {
         employmentStartDate: profile.employmentStartDate,
         insuranceStartDate: profile.insuranceStartDate,
         approved: true,
-        ...teacherPaymentPrismaData(params.payment)
+        ...teacherPaymentPrismaData(params.payment ?? defaultTeacherPaymentSettings())
       }
     });
   });

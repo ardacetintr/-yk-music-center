@@ -28,6 +28,15 @@ export function isTeacherPaymentPeriod(value: string): value is TeacherPaymentPe
   return value === TEACHER_PAYMENT_WEEKLY || value === TEACHER_PAYMENT_MONTHLY;
 }
 
+export function defaultTeacherPaymentSettings(): TeacherPaymentSettings {
+  return {
+    paymentPeriod: TEACHER_PAYMENT_MONTHLY,
+    ratePerLesson: null,
+    paymentDueDayOfMonth: 1,
+    paymentDueDayOfWeek: null
+  };
+}
+
 export function teacherRateToNumber(
   rate: TeacherPaymentRowInput["ratePerLesson"]
 ): number | null {

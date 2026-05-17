@@ -6,6 +6,7 @@ import { teacherCreateSchema } from "@/lib/validations";
 import { normalizePhone, phoneToEmail } from "@/lib/phone";
 import { attachTeacherRowToAdminUser } from "@/lib/link-teacher-to-admin-user";
 import { serializeTeacherInstruments } from "@/lib/teacher-instruments";
+import { defaultTeacherPaymentSettings, teacherPaymentPrismaData } from "@/lib/teacher-payment";
 import { readJsonBody, routeErrorResponse } from "@/lib/route-errors";
 
 export async function GET() {
@@ -85,7 +86,8 @@ export async function POST(request: Request) {
         birthPlace: parsed.birthPlace ?? null,
         employmentStartDate: parsed.employmentStartDate ?? null,
         insuranceStartDate: parsed.insuranceStartDate ?? null,
-        approved: true
+        approved: true,
+        ...teacherPaymentPrismaData(defaultTeacherPaymentSettings())
       }
     });
 
