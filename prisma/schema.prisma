@@ -180,8 +180,63 @@ model StudentLessonSlot {
 
   teacher Teacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
 
+  sessionAttendances LessonSessionAttendance[]
+
   @@index([studentId])
   @@index([scopeType])
+}
+
+/// Günlük yoklama — şablondaki ders satırı + takvim günü (YYYY-MM-DD).
+model LessonSessionAttendance {
+  id String @id @default(cuid())
+
+  lessonSlotId String
+
+  /// YYYY-MM-DD (Europe/Istanbul takvim günü)
+  sessionDate String
+
+  /// PRESENT | ABSENT
+  status String
+
+  checkedInAt DateTime?
+
+  checkedOutAt DateTime?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  lessonSlot StudentLessonSlot @relation(fields: [lessonSlotId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonSlotId, sessionDate])
+  @@index([sessionDate])
+  @@index([lessonSlotId])
+}
+
+/// Enstrüman satış kaydı (mağaza / stok dışı satışlar).
+model InstrumentSale {
+  id String @id @default(cuid())
+
+  /// Satılan enstrüman adı
+  instrumentName String
+
+  /// Alıcı adı (öğrenci veya harici kişi)
+  buyerName String
+
+  /// Türk Lirası
+  price Decimal @db.Decimal(12, 2)
+
+  /// YYYY-MM-DD (Europe/Istanbul takvim günü)
+  soldDate String
+
+  notes String?
+
+  createdAt DateTime @default(now())
+
+  @@index([soldDate])
+  @@index([createdAt])
 }
 
 /// Öğrenci devamsızlık kaydı (tarih + isteğe bağlı not).

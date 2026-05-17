@@ -24,17 +24,17 @@ if errorlevel 1 (
   exit /b 1
 )
 
-call scripts\free-port-3000.cmd
+call scripts\free-port-3003.cmd
 
 echo.
-echo  Site:             http://localhost:3000
-echo  Admin giris:      http://localhost:3000/admin/login
-echo  Durdurmak icin:   Ctrl+C
+echo  Oykü Music Center (bu proje):
+echo  Site:             http://localhost:3003
+echo  Admin giris:      http://localhost:3003/admin/login
 echo.
-echo  NOT: Terminalde baska port yazarsa (3001, 3003...) yukaridaki
-echo       adres yerine terminaldeki Local: satirini kullanin.
+echo  NOT: localhost:3000 baska projedir — Music Center icin 3003 kullanin.
+echo  Durdurmak icin:   Ctrl+C
 echo.
 echo  (Internetten giris icin CANLI-SITE.cmd - istege bagli)
 echo.
-node node_modules\next\dist\bin\next dev -p 3000
+node node_modules\next\dist\bin\next dev -p 3003
 pause

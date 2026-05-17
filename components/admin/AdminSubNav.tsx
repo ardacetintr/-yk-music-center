@@ -6,8 +6,10 @@ import { useEffect, useRef, useState } from "react";
 type Tab =
   | "overview"
   | "schedule"
+  | "attendance"
   | "absences"
   | "accounting"
+  | "instrument-sales"
   | "register-student"
   | "register-teacher";
 
@@ -61,11 +63,20 @@ export default function AdminSubNav({ current }: { current: Tab }) {
         <Link href="/admin/lesson-schedules" className={tabClass(current === "schedule")}>
           Ders programı
         </Link>
+        <Link href="/admin/attendance" className={tabClass(current === "attendance")}>
+          Yoklama
+        </Link>
         <Link href="/admin/absences" className={tabClass(current === "absences")}>
           Devamsızlık
         </Link>
         <Link href="/admin/accounting" className={tabClass(current === "accounting")}>
           Muhasebe
+        </Link>
+        <Link
+          href="/admin/instrument-sales"
+          className={tabClass(current === "instrument-sales")}
+        >
+          Enstrüman satışı
         </Link>
 
         <div className="relative" ref={kayitRef}>

@@ -97,11 +97,25 @@ export default function NavbarMenu({ isLoggedIn, isAdmin }: Props) {
                   Haftalık ders programı
                 </Link>
                 <Link
+                  href="/admin/attendance"
+                  onClick={closeMenu}
+                  className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-zinc-100"
+                >
+                  Yoklama
+                </Link>
+                <Link
                   href="/admin/absences"
                   onClick={closeMenu}
                   className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-zinc-100"
                 >
                   Devamsızlık
+                </Link>
+                <Link
+                  href="/admin/instrument-sales"
+                  onClick={closeMenu}
+                  className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-zinc-100"
+                >
+                  Enstrüman satışı
                 </Link>
               </>
             )}

@@ -59,7 +59,10 @@ export default async function AdminAbsencesPage() {
             </Link>
           </p>
           <h1 className="text-2xl font-semibold">Devamsızlık</h1>
-          <p className="mt-1 text-zinc-400">Öğrencilerin devamsızlık kayıtlarını tutun.</p>
+          <p className="mt-1 text-zinc-400">
+            Öğrencilerin devamsızlık kayıtlarını tutun. Yoklama ile senkron çalışır; buradan eklenen
+            kayıtlar ilgili günün yoklamasında gelmedi olarak görünür.
+          </p>
         </div>
         <p className="text-sm text-zinc-500">{greetingDisplayName(session.name)}</p>
       </div>

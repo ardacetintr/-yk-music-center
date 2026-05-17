@@ -1,7 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getServerSession } from "@/lib/auth";
+import {
+  clearLessonAttendanceFromStudentAbsence,
+  revalidateAttendanceAndAbsences,
+  syncLessonAttendanceFromStudentAbsence
+} from "@/lib/attendance-absence-sync";
 import { prisma } from "@/lib/prisma";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -22,16 +26,31 @@ export async function addStudentAbsence(formData: FormData) {
   if (!studentId) throw new Error("Öğrenci seçin.");
   if (!ISO_DATE.test(absenceDate)) throw new Error("Tarih YYYY-AA-GG olmalıdır.");
 
-  await prisma.studentAbsence.create({
-    data: { studentId, absenceDate, notes }
+  const existing = await prisma.studentAbsence.findFirst({
+    where: { studentId, absenceDate }
   });
-  revalidatePath("/admin/absences");
+  if (!existing) {
+    await prisma.studentAbsence.create({
+      data: { studentId, absenceDate, notes }
+    });
+  }
+
+  await syncLessonAttendanceFromStudentAbsence(studentId, absenceDate);
+  revalidateAttendanceAndAbsences(absenceDate);
 }
 
 export async function deleteStudentAbsence(formData: FormData) {
   await ensureAdmin();
   const id = String(formData.get("id") ?? "").trim();
   if (!id) throw new Error("Kayıt bulunamadı.");
+
+  const row = await prisma.studentAbsence.findUnique({
+    where: { id },
+    select: { studentId: true, absenceDate: true }
+  });
+  if (!row) throw new Error("Kayıt bulunamadı.");
+
   await prisma.studentAbsence.delete({ where: { id } });
-  revalidatePath("/admin/absences");
+  await clearLessonAttendanceFromStudentAbsence(row.studentId, row.absenceDate);
+  revalidateAttendanceAndAbsences(row.absenceDate);
 }
